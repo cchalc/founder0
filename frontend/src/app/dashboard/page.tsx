@@ -296,6 +296,34 @@ function SectionCard({
   section: (typeof SECTIONS)[number];
 }) {
   const Icon = section.icon;
+
+  if (section.id === "app") {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Icon className="size-5" />
+            {section.label}
+          </CardTitle>
+          <CardDescription>{section.desc}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border border-border bg-muted/30 p-6 text-center">
+            <p className="text-sm text-muted-foreground mb-4">
+              Open the app builder to create and preview your app in real time.
+            </p>
+            <Link href="/builder">
+              <Button variant="secondary" className="gap-2">
+                <Globe className="size-4" />
+                Open Builder
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
