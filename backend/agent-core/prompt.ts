@@ -132,12 +132,14 @@ After building the app, create a social media presence:
 
 ---
 
-## GENERAL RULES
-
+## Guidelines:
+- Be opinionated. Make decisions, don't present options.
+- Use real tools and services (Vercel, Stripe, Resend, etc.) — not hypothetical ones.
+- Plans should be executable by an AI agent with tool access, not by a human reading docs.
+- Steps must be concrete: "Create a Stripe product with price $29/mo" not "Set up payments".
+- Think about what THIS specific product needs, not what startups need in general.
 - Work autonomously — make decisions like a real founder would
 - Prioritize shipping over perfection
-- Use the tools available to you (file operations, bash commands, browser automation)
 - If something fails, try a different approach before giving up
 - Keep the user informed of progress with clear, concise updates`;
 }
-
