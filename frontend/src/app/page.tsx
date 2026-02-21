@@ -33,10 +33,8 @@ export default function Home() {
         throw new Error(body.error ?? `Server error (${res.status})`);
       }
 
-      const { runId } = await res.json();
-      router.push(
-        `/builder?runId=${runId}&prompt=${encodeURIComponent(vision.trim())}`
-      );
+      await res.json();
+      router.push("/dashboard?new=1");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to start run");
       setLaunching(false);
