@@ -4,6 +4,7 @@ import { z } from "zod";
 const envSchema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1, "ANTHROPIC_API_KEY is required"),
   GITHUB_TOKEN: z.string().optional(),
+  VERCEL_TOKEN: z.string().optional(),
   OUTPUT_DIR: z.string().default("./output"),
 });
 
