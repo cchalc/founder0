@@ -140,3 +140,7 @@ vite.config.ts.timestamp-*
 
 # Agent output
 output/
+
+# Browserbase context & cookies
+.browserbase-context
+cookies-x.json

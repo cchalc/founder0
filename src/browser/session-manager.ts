@@ -7,11 +7,35 @@ export interface SessionInfo {
   createdAt: Date;
 }
 
+export interface CreateSessionOptions {
+  /** Browserbase Context ID for persisting cookies/auth across sessions. */
+  contextId?: string;
+  /** Whether to save browser data back to the context when the session closes. Defaults to false. */
+  persist?: boolean;
+}
+
 const sessions = new Map<string, SessionInfo>();
 
 let sessionCounter = 0;
 
-export async function createSession(): Promise<SessionInfo> {
+export async function createSession(
+  options: CreateSessionOptions = {},
+): Promise<SessionInfo> {
+  const { contextId, persist } = options;
+
+  const browserSettings: Record<string, unknown> = {
+    blockAds: true,
+    solveCaptchas: true,
+    recordSession: true,
+  };
+
+  if (contextId) {
+    browserSettings.context = { id: contextId, persist: persist ?? true };
+    console.log(
+      `[session-manager] Using context ${contextId} (persist=${persist ?? true})`,
+    );
+  }
+
   const stagehand = new Stagehand({
     env: "BROWSERBASE",
     apiKey: process.env.BROWSERBASE_API_KEY,
@@ -19,11 +43,7 @@ export async function createSession(): Promise<SessionInfo> {
     model: "openai/gpt-4o",
     browserbaseSessionCreateParams: {
       projectId: process.env.BROWSERBASE_PROJECT_ID!,
-      browserSettings: {
-        blockAds: true,
-        solveCaptchas: true,
-        recordSession: true,
-      },
+      browserSettings,
     },
     verbose: 1,
   });

@@ -1,6 +1,8 @@
 /**
- * Save X cookies — launches a Browserbase session, navigates to X login page,
- * and polls until it detects you've logged in. Then saves cookies.
+ * Save X login — launches a Browserbase session with a persistent context,
+ * navigates to X login page, and polls until it detects you've logged in.
+ * The session uses Browserbase Contexts so cookies are saved automatically
+ * when the session closes.
  *
  * You log in by opening the debug URL in your browser and interacting with
  * the live Chrome session directly.
@@ -8,18 +10,23 @@
  * Run: npx tsx src/browser/actions/save-x-cookies.ts
  */
 import { createSession, closeSession } from "../session-manager.js";
+import { getOrCreateContext } from "../context-manager.js";
 import { writeFileSync } from "fs";
 import { resolve } from "path";
 import "dotenv/config";
 
-const COOKIES_PATH = resolve(process.cwd(), "cookies-x.json");
+const PROJECT_ROOT = resolve(import.meta.dirname, "../../..");
+const COOKIES_PATH = resolve(PROJECT_ROOT, "cookies-x.json");
 const POLL_INTERVAL = 5000; // 5 seconds
 const MAX_WAIT = 300000; // 5 minutes
 
 async function main() {
-  console.log("=== Save X Cookies ===\n");
+  console.log("=== Save X Login (Browserbase Context) ===\n");
 
-  const session = await createSession();
+  // Get or create a Browserbase context to persist cookies
+  const contextId = await getOrCreateContext();
+
+  const session = await createSession({ contextId, persist: true });
   const { stagehand } = session;
   const page = stagehand.context.pages()[0] as any;
 
@@ -52,7 +59,7 @@ async function main() {
 
       if (hasLoggedInIndicator || (url.includes("x.com/home") && !url.includes("flow"))) {
         loggedIn = true;
-        console.log(`Detected login! URL: ${url}`);
+        console.log(`\nDetected login! URL: ${url}`);
         break;
       }
 
@@ -72,21 +79,31 @@ async function main() {
   }
 
   // Wait a bit for cookies to settle
+  console.log("Waiting for cookies to settle...");
   await new Promise((r) => setTimeout(r, 3000));
 
-  // Get all cookies via CDP
-  const { cookies } = await page.sendCDP("Network.getCookies", {
-    urls: ["https://x.com", "https://twitter.com"],
-  });
+  // Save cookies to local file as well (fallback for when context cookies don't work)
+  try {
+    const { cookies } = await page.sendCDP("Network.getCookies", {
+      urls: ["https://x.com", "https://twitter.com"],
+    });
+    writeFileSync(COOKIES_PATH, JSON.stringify(cookies, null, 2));
+    console.log(`Saved ${cookies.length} cookies to ${COOKIES_PATH}`);
+  } catch (err) {
+    console.log("Could not save cookies to file:", err);
+  }
 
-  console.log(`\nGot ${cookies.length} cookies`);
-
-  // Save cookies to file
-  writeFileSync(COOKIES_PATH, JSON.stringify(cookies, null, 2));
-  console.log(`Saved to ${COOKIES_PATH}`);
-
+  // Close the session — persist: true means Browserbase also saves cookies to the context
   await closeSession(session.sessionId);
-  console.log("\n=== Done! You can now run test-post-x.ts ===");
+
+  // Give Browserbase a few seconds to sync the context data
+  console.log("Waiting for context to sync...");
+  await new Promise((r) => setTimeout(r, 5000));
+
+  console.log(`\n=== Done! Cookies saved to: ===`);
+  console.log(`  1. Browserbase Context: ${contextId}`);
+  console.log(`  2. Local file: ${COOKIES_PATH}`);
+  console.log("=== You can now run test-post-x.ts ===");
 }
 
 main().catch((err) => {

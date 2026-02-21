@@ -1,7 +1,12 @@
 import { createSession, getSession, closeSession } from "../session-manager.js";
+import { getOrCreateContext, getStoredContextId } from "../context-manager.js";
 import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 import "dotenv/config";
+
+// Always resolve relative to project root, not CWD
+const PROJECT_ROOT = resolve(import.meta.dirname, "../../..");
+const COOKIES_PATH = resolve(PROJECT_ROOT, "cookies-x.json");
 
 export interface PostToXOptions {
   username: string;
@@ -22,100 +27,95 @@ function humanDelay(min: number, max: number) {
   return new Promise((r) => setTimeout(r, min + Math.random() * (max - min)));
 }
 
-const COOKIES_PATH = resolve(process.cwd(), "cookies-x.json");
-
-async function injectCookies(page: any): Promise<boolean> {
-  if (!existsSync(COOKIES_PATH)) {
-    console.log("[post-to-x] No cookies file found at", COOKIES_PATH);
-    return false;
-  }
-
-  try {
-    const raw = readFileSync(COOKIES_PATH, "utf-8");
-    const cookies = JSON.parse(raw);
-
-    if (!Array.isArray(cookies) || cookies.length === 0) {
-      console.log("[post-to-x] Cookies file is empty");
-      return false;
-    }
-
-    console.log(`[post-to-x] Injecting ${cookies.length} cookies...`);
-
-    // Set each cookie via CDP
-    for (const cookie of cookies) {
-      try {
-        await page.sendCDP("Network.setCookie", {
-          name: cookie.name,
-          value: cookie.value,
-          domain: cookie.domain,
-          path: cookie.path || "/",
-          secure: cookie.secure ?? true,
-          httpOnly: cookie.httpOnly ?? false,
-          sameSite: cookie.sameSite || "Lax",
-          expires: cookie.expires || (Date.now() / 1000 + 86400 * 30), // 30 days if not set
-        });
-      } catch {
-        // Some cookies may fail, that's OK
-      }
-    }
-
-    console.log("[post-to-x] Cookies injected");
-    return true;
-  } catch (err) {
-    console.log("[post-to-x] Failed to load cookies:", err);
-    return false;
-  }
-}
-
 export async function postToX(options: PostToXOptions): Promise<PostToXResult> {
   const { username, password, text, sessionId } = options;
 
+  // Use Browserbase Context to reuse cookies/auth from previous sessions
+  const contextId = getStoredContextId();
+
   const session = sessionId
-    ? getSession(sessionId) ?? (await createSession())
-    : await createSession();
+    ? getSession(sessionId) ?? await createSession({ contextId: contextId ?? undefined, persist: true })
+    : await createSession({ contextId: contextId ?? undefined, persist: true });
 
   const { stagehand } = session;
   const page = stagehand.context.pages()[0] as any;
 
   try {
-    // Step 1: Inject cookies and navigate to X home
-    const hasCookies = await injectCookies(page);
+    // Try cookies-x.json first, then context, then login flow
+    let loggedIn = false;
 
-    if (hasCookies) {
-      // Navigate to home — cookies should keep us logged in
-      console.log("[post-to-x] Navigating to X home with cookies...");
+    // Method 1: Inject cookies from cookies-x.json
+    if (existsSync(COOKIES_PATH)) {
+      try {
+        const cookies = JSON.parse(readFileSync(COOKIES_PATH, "utf-8"));
+        if (Array.isArray(cookies) && cookies.length > 0) {
+          console.log(`[post-to-x] Injecting ${cookies.length} cookies from cookies-x.json...`);
+          for (const cookie of cookies) {
+            try {
+              await page.sendCDP("Network.setCookie", {
+                name: cookie.name,
+                value: cookie.value,
+                domain: cookie.domain,
+                path: cookie.path || "/",
+                secure: cookie.secure ?? true,
+                httpOnly: cookie.httpOnly ?? false,
+                sameSite: cookie.sameSite || "Lax",
+                expires: cookie.expires || (Date.now() / 1000 + 86400 * 30),
+              });
+            } catch { /* some cookies may fail */ }
+          }
+
+          await page.goto("https://x.com/home", {
+            waitUntil: "domcontentloaded",
+            timeoutMs: 30_000,
+          });
+          await humanDelay(3000, 4000);
+
+          loggedIn = await page.evaluate(() => {
+            const compose = document.querySelector('[data-testid="tweetTextarea_0"]');
+            const timeline = document.querySelector('[data-testid="primaryColumn"]');
+            const sideNav = document.querySelector('[data-testid="SideNav_NewTweet_Button"]');
+            return Boolean(compose || timeline || sideNav);
+          });
+
+          if (loggedIn) {
+            console.log("[post-to-x] Logged in via cookies-x.json!");
+          } else {
+            console.log("[post-to-x] cookies-x.json didn't work, trying next method...");
+          }
+        }
+      } catch (err) {
+        console.log(`[post-to-x] cookies-x.json failed: ${err}`);
+      }
+    }
+
+    // Method 2: Browserbase context cookies
+    if (!loggedIn && contextId) {
+      console.log("[post-to-x] Navigating to X home with context cookies...");
       await page.goto("https://x.com/home", {
         waitUntil: "domcontentloaded",
         timeoutMs: 30_000,
       });
       await humanDelay(3000, 4000);
 
-      const url: string = page.url();
-      const bodyText: string = await page.evaluate(() => document.body.innerText);
-      console.log(`[post-to-x] URL: ${url}`);
-      console.log(`[post-to-x] Page text (first 200): "${bodyText.slice(0, 200)}"`);
-
-      // Check if we're actually logged in (home page should have compose box or timeline)
-      const isLoggedIn = await page.evaluate(() => {
-        // Check for known logged-in indicators
+      loggedIn = await page.evaluate(() => {
         const compose = document.querySelector('[data-testid="tweetTextarea_0"]');
         const timeline = document.querySelector('[data-testid="primaryColumn"]');
         const sideNav = document.querySelector('[data-testid="SideNav_NewTweet_Button"]');
-        return !!(compose || timeline || sideNav);
+        return Boolean(compose || timeline || sideNav);
       });
 
-      if (!isLoggedIn) {
-        console.log("[post-to-x] Cookies didn't work — not logged in. Need fresh cookies.");
-        console.log("[post-to-x] Run: npx tsx src/browser/actions/save-x-cookies.ts");
-        throw new Error(
-          "Cookies expired or invalid. Run 'npx tsx src/browser/actions/save-x-cookies.ts' to get fresh cookies."
-        );
+      if (loggedIn) {
+        console.log("[post-to-x] Logged in via context cookies!");
+      } else {
+        console.log("[post-to-x] Context cookies didn't work either...");
       }
+    }
 
-      console.log("[post-to-x] Logged in via cookies!");
-    } else {
-      // No cookies — try the login flow (may fail due to bot detection)
-      console.log("[post-to-x] No cookies found, attempting login flow...");
+    // Method 3: Login flow fallback
+    if (!loggedIn) {
+      // No context — try the login flow (may fail due to bot detection)
+      console.log("[post-to-x] No context found, attempting login flow...");
       await page.goto("https://x.com/i/flow/login", {
         waitUntil: "domcontentloaded",
         timeoutMs: 30_000,
@@ -157,7 +157,7 @@ export async function postToX(options: PostToXOptions): Promise<PostToXResult> {
 
       if (!passwordTyped) {
         throw new Error(
-          "Could not type password — iframe not accessible. Try the cookies method: npx tsx src/browser/actions/save-x-cookies.ts"
+          "Could not type password — iframe not accessible. Try: npx tsx src/browser/actions/save-x-cookies.ts"
         );
       }
       await humanDelay(600, 1000);
@@ -179,29 +179,16 @@ export async function postToX(options: PostToXOptions): Promise<PostToXResult> {
         afterLower.includes("join today")
       ) {
         throw new Error(
-          `Login failed (bot detection?). Try cookies method: npx tsx src/browser/actions/save-x-cookies.ts`
+          `Login failed (bot detection?). Try: npx tsx src/browser/actions/save-x-cookies.ts`
         );
       }
 
       console.log("[post-to-x] Logged in via login flow!");
-
-      // Save cookies for next time
-      try {
-        const { cookies } = await page.sendCDP("Network.getCookies", {
-          urls: ["https://x.com", "https://twitter.com"],
-        });
-        const { writeFileSync } = await import("fs");
-        writeFileSync(COOKIES_PATH, JSON.stringify(cookies, null, 2));
-        console.log(`[post-to-x] Saved ${cookies.length} cookies for next time`);
-      } catch {
-        console.log("[post-to-x] Could not save cookies");
-      }
     }
 
-    // Step 2: Compose and post tweet
+    // Compose and post tweet
     console.log("[post-to-x] Composing tweet...");
 
-    // Click the compose area
     const composeFocused = await page.evaluate(() => {
       const textarea = document.querySelector('[data-testid="tweetTextarea_0"]') as HTMLElement;
       if (textarea) { textarea.focus(); textarea.click(); return true; }
@@ -214,13 +201,11 @@ export async function postToX(options: PostToXOptions): Promise<PostToXResult> {
     }
     await humanDelay(800, 1200);
 
-    // Type the tweet text — must use act() for React
     await stagehand.act("type %text% into the tweet compose area", {
       variables: { text },
     });
     await humanDelay(1000, 1500);
 
-    // Post — try evaluate first for the Post button
     console.log("[post-to-x] Posting...");
     const postClicked = await page.evaluate(() => {
       const btn = document.querySelector('[data-testid="tweetButtonInline"]') as HTMLElement;
