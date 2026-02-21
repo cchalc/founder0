@@ -1,0 +1,12 @@
+{
+  "testRecipients": [
+    "chris.chalcraft@gmail.com",
+    "founder0testing@gmail.com"
+  ],
+  "description": "Test email addresses for email automation functionality testing",
+  "notes": [
+    "Use these addresses for testing outreach emails",
+    "Safe to send test emails to these addresses",
+    "Can be used with sendOutreachEmail() or sendEmail() functions"
+  ]
+}
