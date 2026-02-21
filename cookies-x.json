@@ -1,0 +1,12 @@
+[
+  {
+    "name": "auth_token",
+    "value": "8bfa4a5fbd9127539414e0e57ff8121c0c13d218",
+    "domain": ".x.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true,
+    "sameSite": "None",
+    "expires": -1
+  }
+]
