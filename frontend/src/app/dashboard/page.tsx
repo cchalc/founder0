@@ -18,7 +18,6 @@ import {
   Monitor,
   RefreshCw,
   ExternalLink,
-  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -184,58 +183,36 @@ function DashboardContent() {
     }
   }, [events]);
 
-  const statusConfig: Record<
-    RunStatus,
-    { color: string; glow: string; label: string }
-  > = {
-    idle: {
-      color: "bg-amber-400",
-      glow: "shadow-[0_0_8px_hsl(45,90%,55%,0.4)]",
-      label: "Idle",
-    },
-    running: {
-      color: "bg-[hsl(var(--glow-cyan))]",
-      glow: "shadow-[0_0_8px_hsl(190,95%,60%,0.5)]",
-      label: "Running",
-    },
-    completed: {
-      color: "bg-emerald-400",
-      glow: "shadow-[0_0_8px_hsl(160,80%,55%,0.4)]",
-      label: "Completed",
-    },
-    error: {
-      color: "bg-red-400",
-      glow: "shadow-[0_0_8px_hsl(0,80%,55%,0.4)]",
-      label: "Error",
-    },
+  const statusConfig: Record<RunStatus, { color: string; label: string }> = {
+    idle: { color: "bg-amber-500/80", label: "Idle" },
+    running: { color: "bg-emerald-500", label: "Running" },
+    completed: { color: "bg-blue-500", label: "Completed" },
+    error: { color: "bg-red-500", label: "Error" },
   };
 
-  const { color, glow, label } = statusConfig[status];
+  const { color, label } = statusConfig[status];
 
   return (
-    <div className="flex h-screen flex-col bg-background noise-overlay">
-      {/* Subtle mesh in background */}
-      <div className="mesh-bg" />
-
+    <div className="flex h-screen flex-col bg-background">
       {/* Nav */}
-      <header className="relative z-20 shrink-0 border-b border-border/50 backdrop-blur-md bg-background/70">
+      <header className="shrink-0 border-b border-border">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-3">
           <Link
             href="/"
-            className="text-lg font-semibold tracking-tight text-foreground hover:opacity-90 transition-opacity"
+            className="text-lg font-semibold tracking-tight text-foreground hover:opacity-90"
           >
             Founder Agent
           </Link>
-          <nav className="flex items-center gap-5">
+          <nav className="flex items-center gap-6">
             {runInfo?.vision && (
-              <span className="max-w-[300px] truncate rounded-md border border-border/40 bg-muted/30 px-3 py-1 text-xs font-mono text-muted-foreground">
+              <span className="max-w-[300px] truncate text-xs text-muted-foreground">
                 {runInfo.vision}
               </span>
             )}
-            <div className="flex items-center gap-2.5 rounded-full border border-border/40 bg-muted/30 px-3 py-1.5">
+            <div className="flex items-center gap-2">
               <span
-                className={`h-2 w-2 rounded-full ${color} ${glow} ${
-                  status === "running" ? "status-dot" : ""
+                className={`h-2 w-2 rounded-full ${color} ${
+                  status === "running" ? "animate-pulse" : ""
                 }`}
               />
               <span className="text-xs font-mono text-muted-foreground">
@@ -247,17 +224,17 @@ function DashboardContent() {
       </header>
 
       {/* Main content */}
-      <div className="relative z-10 flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden">
         <Tabs defaultValue="app" className="flex h-full flex-col">
-          <div className="shrink-0 border-b border-border/50 bg-background/50 backdrop-blur-sm px-6">
-            <TabsList className="h-auto justify-start gap-0 rounded-none bg-transparent p-0">
+          <div className="shrink-0 border-b border-border px-6">
+            <TabsList className="h-auto justify-start gap-1 rounded-none bg-transparent p-0">
               {SECTIONS.map(({ id, label, icon: Icon }) => (
                 <TabsTrigger
                   key={id}
                   value={id}
-                  className="tab-glow relative gap-2 rounded-none border-b-2 border-transparent px-5 py-3.5 text-muted-foreground transition-all data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-transparent hover:text-foreground/70"
+                  className="gap-2 rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
                 >
-                  <Icon className="size-3.5" />
+                  <Icon className="size-4" />
                   {label}
                 </TabsTrigger>
               ))}
@@ -276,7 +253,6 @@ function DashboardContent() {
             </TabsContent>
 
             {/* Plan-based tabs */}
-            {/* TODO: re-add session replay (Browserbase rrweb) to social tab once recordings are reliably saved */}
             <TabsContent value="social" className="mt-0 h-full overflow-y-auto p-6">
               <PlanTab
                 title="Social Media"
@@ -304,13 +280,7 @@ function DashboardContent() {
                 title="Outreach"
                 icon={Mail}
                 plans={plans}
-                matchKeys={[
-                  "outreach",
-                  "developer-outreach",
-                  "seo-content",
-                  "seo-strategy",
-                  "seo_content",
-                ]}
+                matchKeys={["outreach", "developer-outreach", "seo-content", "seo-strategy", "seo_content"]}
                 fallbackDesc="Developer outreach, partnerships, SEO strategy, and cold outreach."
                 status={status}
               />
@@ -342,48 +312,33 @@ function AppTabContent({
   return (
     <div className="flex h-full">
       {/* Left: agent feed */}
-      <div className="w-[400px] shrink-0 flex flex-col border-r border-border/50 bg-background/40 backdrop-blur-sm">
-        <div className="flex items-center gap-2.5 border-b border-border/50 px-4 py-3">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[hsl(var(--glow-cyan)/0.1)] border border-[hsl(var(--glow-cyan)/0.15)]">
-            <Terminal className="size-3 text-[hsl(var(--glow-cyan))]" />
-          </div>
-          <span className="text-sm font-semibold tracking-tight">Agent Feed</span>
+      <div className="w-[380px] shrink-0 flex flex-col border-r border-border">
+        <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+          <Bot className="size-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Agent Feed</span>
           {status === "running" && (
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-[10px] font-mono text-[hsl(var(--glow-cyan))] uppercase tracking-widest">
-                Live
-              </span>
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(var(--glow-cyan))] opacity-50" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[hsl(var(--glow-cyan))]" />
-              </span>
-            </div>
+            <Loader2 className="ml-auto size-3.5 animate-spin text-emerald-400" />
           )}
         </div>
 
         <div
           ref={feedRef}
-          className="relative flex-1 overflow-y-auto px-3 py-3 space-y-1.5 feed-scanline"
+          className="flex-1 overflow-y-auto px-3 py-3 space-y-2"
         >
           {events.length === 0 && status === "idle" && (
             <div className="flex flex-col items-center justify-center h-full text-center px-4">
-              <div className="rounded-xl border border-border/40 bg-muted/20 p-4 mb-4">
-                <Bot className="size-8 text-muted-foreground/30" />
-              </div>
+              <Bot className="size-8 text-muted-foreground/30 mb-3" />
               <p className="text-sm text-muted-foreground">No active run</p>
-              <p className="text-xs text-muted-foreground/50 mt-1.5">
+              <p className="text-xs text-muted-foreground/60 mt-1">
                 Launch a project from the home page to see agent activity here.
               </p>
             </div>
           )}
           {events.length === 0 && status === "running" && (
-            <div className="flex flex-col items-center gap-3 justify-center py-12">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-[hsl(var(--glow-cyan)/0.15)] blur-xl" />
-                <Loader2 className="relative size-6 animate-spin text-[hsl(var(--glow-cyan))]" />
-              </div>
-              <span className="text-xs font-mono text-muted-foreground">
-                Initializing agent...
+            <div className="flex items-center gap-2 justify-center py-8">
+              <Loader2 className="size-4 animate-spin text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                Waiting for agent…
               </span>
             </div>
           )}
@@ -393,44 +348,32 @@ function AppTabContent({
         </div>
       </div>
 
-      {/* Right: iframe preview with browser chrome */}
-      <div className="flex-1 flex flex-col bg-[hsl(240,6%,4%)]">
-        {/* Browser chrome bar */}
-        <div className="flex items-center justify-between border-b border-border/50 px-4 py-2.5 bg-background/40 backdrop-blur-sm">
-          <div className="flex items-center gap-3">
-            {/* Traffic light dots */}
-            <div className="browser-dots flex gap-1.5">
-              <span className="bg-[#ff5f57]" />
-              <span className="bg-[#febc2e]" />
-              <span className="bg-[#28c840]" />
-            </div>
-            {/* URL bar */}
-            <div className="flex items-center gap-2 rounded-md border border-border/40 bg-muted/30 px-3 py-1 min-w-[200px]">
-              <Globe className="size-3 text-muted-foreground/50" />
-              <span className="text-xs font-mono text-muted-foreground/60">
-                {previewStatus?.ready ? "localhost:4000" : "..."}
-              </span>
-            </div>
+      {/* Right: iframe preview */}
+      <div className="flex-1 flex flex-col bg-[#0a0a0a]">
+        <div className="flex items-center justify-between border-b border-border px-4 py-2">
+          <div className="flex items-center gap-2">
+            <Monitor className="size-4 text-muted-foreground" />
+            <span className="text-sm font-medium">Preview</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {previewStatus?.ready && (
               <>
-                <button
-                  onClick={() => setIframeKey((k) => k + 1)}
-                  className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all"
-                >
-                  <RefreshCw className="size-3" />
-                  Refresh
-                </button>
                 <a
                   href={PREVIEW_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-all"
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ExternalLink className="size-3" />
                   Open
                 </a>
+                <button
+                  onClick={() => setIframeKey((k) => k + 1)}
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <RefreshCw className="size-3" />
+                  Refresh
+                </button>
               </>
             )}
           </div>
@@ -438,60 +381,38 @@ function AppTabContent({
 
         <div className="flex-1 relative">
           {!previewStatus?.ready ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center dot-grid">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
               {status === "running" ? (
                 <>
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 rounded-2xl bg-[hsl(var(--glow-cyan)/0.08)] blur-2xl scale-150" />
-                    <div className="relative rounded-2xl border border-border/40 bg-muted/20 p-5">
-                      <Loader2 className="size-8 animate-spin text-[hsl(var(--glow-cyan)/0.5)]" />
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-foreground/70">
-                    Agent is building your app...
+                  <Loader2 className="size-8 animate-spin text-muted-foreground/30 mb-4" />
+                  <p className="text-sm text-muted-foreground">
+                    Agent is building your app…
                   </p>
-                  <p className="text-xs text-muted-foreground/50 mt-2 max-w-[240px]">
+                  <p className="text-xs text-muted-foreground/60 mt-1">
                     Preview will appear when the build completes.
                   </p>
                 </>
               ) : status === "completed" ? (
                 <>
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 rounded-2xl bg-emerald-500/10 blur-2xl scale-150" />
-                    <div className="relative rounded-2xl border border-border/40 bg-muted/20 p-5">
-                      <Loader2 className="size-8 animate-spin text-emerald-400/60" />
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-foreground/70">
-                    Starting preview server...
+                  <Loader2 className="size-8 animate-spin text-muted-foreground/30 mb-4" />
+                  <p className="text-sm text-muted-foreground">
+                    Starting preview server…
                   </p>
                 </>
               ) : status === "error" ? (
                 <>
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 rounded-2xl bg-red-500/10 blur-2xl scale-150" />
-                    <div className="relative rounded-2xl border border-red-500/20 bg-muted/20 p-5">
-                      <AlertCircle className="size-8 text-red-400/60" />
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-foreground/70">
-                    Build failed
-                  </p>
-                  <p className="text-xs text-muted-foreground/50 mt-2">
-                    Check the agent feed for details.
+                  <AlertCircle className="size-8 text-red-400/50 mb-4" />
+                  <p className="text-sm text-muted-foreground">
+                    Build failed. Check the agent feed for details.
                   </p>
                 </>
               ) : (
                 <>
-                  <div className="relative mb-6">
-                    <div className="relative rounded-2xl border border-border/30 bg-muted/10 p-5">
-                      <Monitor className="size-8 text-muted-foreground/20" />
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground/60">
+                  <Monitor className="size-8 text-muted-foreground/20 mb-4" />
+                  <p className="text-sm text-muted-foreground">
                     No app to preview yet
                   </p>
-                  <p className="text-xs text-muted-foreground/30 mt-2">
+                  <p className="text-xs text-muted-foreground/60 mt-1">
                     Launch a project to see a live preview here.
                   </p>
                 </>
@@ -537,14 +458,8 @@ function PlanTab({
 
   // Also show plans that partially match the tab name
   const titleMatch = Object.entries(plans).filter(([filename]) => {
-    const name = filename
-      .replace(".md", "")
-      .toLowerCase()
-      .replace(/-/g, " ");
-    return (
-      name.includes(title.toLowerCase()) &&
-      !matched.some(([f]) => f === filename)
-    );
+    const name = filename.replace(".md", "").toLowerCase().replace(/-/g, " ");
+    return name.includes(title.toLowerCase()) && !matched.some(([f]) => f === filename);
   });
 
   const allMatched = [...matched, ...titleMatch];
@@ -552,21 +467,19 @@ function PlanTab({
   if (allMatched.length === 0) {
     return (
       <div className="mx-auto max-w-3xl">
-        <div className="glow-card rounded-xl overflow-hidden">
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[hsl(var(--glow-cyan)/0.08)] border border-[hsl(var(--glow-cyan)/0.12)]">
-                <Icon className="size-3.5 text-[hsl(var(--glow-cyan))]" />
-              </div>
+            <CardTitle className="flex items-center gap-2">
+              <Icon className="size-5" />
               {title}
             </CardTitle>
             <CardDescription>{fallbackDesc}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="rounded-lg border border-border/40 bg-muted/15 p-10 text-center dot-grid">
+            <div className="rounded-md border border-border bg-muted/30 p-8 text-center">
               {status === "running" ? (
                 <div className="flex flex-col items-center gap-3">
-                  <Loader2 className="size-6 animate-spin text-[hsl(var(--glow-cyan)/0.5)]" />
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">
                     Agent is still working. Plans will appear when ready.
                   </p>
@@ -582,7 +495,7 @@ function PlanTab({
               )}
             </div>
           </CardContent>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -590,22 +503,11 @@ function PlanTab({
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {allMatched.map(([filename, content]) => (
-        <motion.div
-          key={filename}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="glow-card rounded-xl overflow-hidden"
-        >
+        <Card key={filename}>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2.5 text-base">
-              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[hsl(var(--glow-cyan)/0.08)] border border-[hsl(var(--glow-cyan)/0.12)]">
-                <Icon className="size-3 text-[hsl(var(--glow-cyan))]" />
-              </div>
-              {filename
-                .replace(".md", "")
-                .replace(/-/g, " ")
-                .replace(/\b\w/g, (c) => c.toUpperCase())}
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Icon className="size-4" />
+              {filename.replace(".md", "").replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -615,7 +517,7 @@ function PlanTab({
               </pre>
             </div>
           </CardContent>
-        </motion.div>
+        </Card>
       ))}
     </div>
   );
@@ -626,72 +528,41 @@ function PlanTab({
 /* ------------------------------------------------------------------ */
 
 function FeedItem({ event, index }: { event: AgentEvent; index: number }) {
-  const config: Record<
-    string,
-    { icon: React.ReactNode; label: string; accent: string; bg: string }
-  > = {
-    assistant_text: {
-      icon: <Terminal className="size-3" />,
-      label: "Agent",
-      accent: "text-[hsl(var(--glow-cyan))]",
-      bg: "bg-[hsl(var(--glow-cyan)/0.06)] border-[hsl(var(--glow-cyan)/0.1)]",
-    },
-    tool_use: {
-      icon: <Wrench className="size-3" />,
-      label: "Tool",
-      accent: "text-[hsl(var(--glow-violet))]",
-      bg: "bg-[hsl(var(--glow-violet)/0.06)] border-[hsl(var(--glow-violet)/0.1)]",
-    },
-    tool_result: {
-      icon: <ChevronRight className="size-3" />,
-      label: "Result",
-      accent: "text-muted-foreground",
-      bg: "bg-muted/20 border-border/30",
-    },
-    result: {
-      icon: <CheckCircle2 className="size-3" />,
-      label: "Done",
-      accent: "text-emerald-400",
-      bg: "bg-emerald-500/5 border-emerald-500/10",
-    },
-    error: {
-      icon: <AlertCircle className="size-3" />,
-      label: "Error",
-      accent: "text-red-400",
-      bg: "bg-red-500/5 border-red-500/10",
-    },
+  const iconMap: Record<string, React.ReactNode> = {
+    assistant_text: <Terminal className="size-3 shrink-0 text-emerald-400" />,
+    tool_use: <Wrench className="size-3 shrink-0 text-blue-400" />,
+    result: <CheckCircle2 className="size-3 shrink-0 text-blue-400" />,
+    error: <AlertCircle className="size-3 shrink-0 text-red-400" />,
   };
 
-  const c = config[event.type] ?? config.tool_result;
+  const labelMap: Record<string, string> = {
+    assistant_text: "Agent",
+    tool_use: "Tool",
+    result: "Result",
+    error: "Error",
+  };
 
   const truncated =
-    event.type === "assistant_text" &&
-    event.content &&
-    event.content.length > 200
-      ? event.content.slice(0, 200) + "..."
+    event.type === "assistant_text" && event.content && event.content.length > 200
+      ? event.content.slice(0, 200) + "…"
       : event.content;
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 6 }}
+      initial={{ opacity: 0, x: 8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.15 }}
-      className={`rounded-lg border ${c.bg} p-3 transition-colors hover:border-opacity-60`}
+      className="rounded-md border border-border bg-muted/50 p-3"
     >
-      <div className="flex items-center gap-2">
-        <span className={`${c.accent} shrink-0`}>{c.icon}</span>
-        <span className={`text-[11px] font-mono font-medium ${c.accent} uppercase tracking-wide`}>
-          {c.label}
-        </span>
-        <span className="text-[10px] font-mono text-muted-foreground/30 ml-auto">
-          #{String(index + 1).padStart(3, "0")}
+      <div className="flex items-center gap-1.5">
+        {iconMap[event.type]}
+        <span className="text-xs font-mono text-primary">
+          {labelMap[event.type] ?? event.type} #{index + 1}
         </span>
       </div>
-      {truncated && (
-        <p className="mt-1.5 text-xs text-muted-foreground/70 whitespace-pre-wrap break-words font-mono leading-relaxed">
-          {truncated}
-        </p>
-      )}
+      <p className="mt-1 text-xs text-muted-foreground whitespace-pre-wrap break-words">
+        {truncated}
+      </p>
     </motion.div>
   );
 }
