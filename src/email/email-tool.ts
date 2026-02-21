@@ -39,14 +39,32 @@ export async function sendEmail(
   inboxId: string,
   to: string | string[],
   subject: string,
-  body: string
+  body: string,
+  html?: string
 ): Promise<SendResult> {
+  // Validate inputs
   const recipients = Array.isArray(to) ? to : [to];
+
+  if (recipients.length === 0) {
+    throw new Error("At least one recipient is required");
+  }
+
+  if (!subject || subject.trim().length === 0) {
+    throw new Error("Subject is required");
+  }
+
+  if (!body || body.trim().length === 0) {
+    throw new Error("Email body is required");
+  }
+
+  // Use provided HTML or convert plain text to HTML with preserved line breaks
+  const htmlContent = html || body.replace(/\n/g, '<br>').replace(/\n\n/g, '<br><br>');
+
   const result = await client.inboxes.messages.send(inboxId, {
     to: recipients,
     subject,
     text: body,
-    html: `<p>${body}</p>`,
+    html: htmlContent,
   });
   console.log(`[email] Sent email from ${inboxId} to ${recipients.join(", ")}`);
   return {

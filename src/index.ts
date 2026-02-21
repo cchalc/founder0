@@ -3,8 +3,29 @@ export { createSession, getSession, closeSession, closeAllSessions, listSessions
 export { saveSessionRecording } from "./browser/recording-manager.js";
 export { browserAction, type BrowserActionResult, type BrowserActionOptions } from "./browser/browser-tool.js";
 
-// Email
+// Email - Full API (with explicit inbox management)
 export { createInbox, sendEmail, listEmails, waitForEmail, type InboxInfo, type EmailMessage, type SendResult, type WaitForEmailOptions } from "./email/email-tool.js";
+
+// Email - Simplified API (uses configured cursorhack@agentmail.to inbox)
+export {
+  sendEmail as sendEmailSimple,
+  listEmails as listEmailsSimple,
+  getEmail,
+  waitForEmail as waitForEmailSimple,
+  replyToEmail,
+  getInboxId,
+  type EmailMessage as EmailMessageSimple,
+  type SendResult as SendResultSimple,
+  type WaitForEmailOptions as WaitForEmailOptionsSimple
+} from "./email/agent-email.js";
+
+// Email - Outreach
+export {
+  generateOutreachEmail,
+  formatOutreachEmailForFile,
+  sendOutreachEmail,
+  type ProductSpec
+} from "./email/outreach-generator.js";
 
 // Browser actions
 export { signupForX, PhoneVerificationRequiredError, type SignupResult } from "./browser/actions/signup-x.js";
@@ -60,7 +81,7 @@ export const toolSchemas = {
 
   send_email: {
     name: "send_email",
-    description: "Send an email from the agent's inbox.",
+    description: "Send an email from the agent's inbox. Supports both plain text and HTML emails.",
     parameters: {
       type: "object" as const,
       properties: {
@@ -78,7 +99,11 @@ export const toolSchemas = {
         },
         body: {
           type: "string",
-          description: "Email body text",
+          description: "Email body text (plain text)",
+        },
+        html: {
+          type: "string",
+          description: "Optional HTML version of the email body (for rich formatting)",
         },
       },
       required: ["inboxId", "to", "subject", "body"],

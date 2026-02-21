@@ -1,0 +1,23 @@
+{
+  "name": "requirements-bot",
+  "version": "1.0.0",
+  "description": "AI chatbot for gathering product requirements and generating specification documents",
+  "type": "module",
+  "main": "chatbot.js",
+  "scripts": {
+    "start": "node chatbot.js",
+    "chat": "node chatbot.js"
+  },
+  "keywords": [
+    "chatbot",
+    "requirements",
+    "ai",
+    "claude",
+    "specifications"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1"
+  }
+}

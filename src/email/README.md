@@ -20,9 +20,17 @@ When the chat agent generates a product specification:
 Each outreach email includes:
 - ✉️ **Subject line** optimized for opens
 - 📝 **Body copy** highlighting problem, solution, features
+- 🎨 **Rich HTML** with professional formatting and styling
 - 💰 **Pricing info** (if applicable)
 - 🎯 **Target audience** information
 - 📋 **Send instructions** (code + manual)
+
+### HTML Email Support
+
+All emails support both plain text and HTML:
+- **Plain text emails**: Line breaks are automatically preserved
+- **Custom HTML**: Pass optional HTML parameter for rich formatting
+- **Outreach emails**: Automatically use professional HTML templates with styling
 
 ## Example Workflow
 
@@ -83,8 +91,16 @@ import {
 // Get inbox (always cursorhack@agentmail.to)
 const inbox = getInboxId();
 
-// Send email
-await sendEmail('to@example.com', 'Subject', 'Body');
+// Send plain text email
+await sendEmail('to@example.com', 'Subject', 'Body text');
+
+// Send HTML email (with plain text fallback)
+await sendEmail(
+  'to@example.com',
+  'Subject',
+  'Plain text version',
+  '<h1>HTML version</h1><p>With formatting</p>'
+);
 
 // List all emails
 const emails = await listEmails();

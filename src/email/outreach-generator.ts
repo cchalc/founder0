@@ -205,7 +205,7 @@ export async function sendOutreachEmail(
   console.log(`[outreach] Sending to ${recipientList.length} recipient(s)...`);
 
   for (const recipient of recipientList) {
-    await sendEmail(recipient, email.subject, email.body);
+    await sendEmail(recipient, email.subject, email.body, email.htmlBody);
     console.log(`[outreach] Sent to ${recipient}`);
     // Rate limit: wait 1 second between sends
     await new Promise(resolve => setTimeout(resolve, 1000));
