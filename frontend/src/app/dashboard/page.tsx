@@ -1,8 +1,20 @@
 "use client";
 
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Bot, MessageSquare, Globe, FileText, Mail } from "lucide-react";
+import {
+  Bot,
+  MessageSquare,
+  Globe,
+  FileText,
+  Mail,
+  Terminal,
+  Wrench,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,6 +30,14 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+
+interface AgentEvent {
+  type: "assistant_text" | "tool_use" | "tool_result" | "result" | "error" | "done";
+  content?: string;
+  timestamp?: string;
+}
 
 const SECTIONS = [
   {
@@ -46,7 +66,68 @@ const SECTIONS = [
   },
 ] as const;
 
+type RunStatus = "idle" | "running" | "completed" | "error";
+
 export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
+  );
+}
+
+function DashboardContent() {
+  const searchParams = useSearchParams();
+  const runId = searchParams.get("runId");
+
+  const [status, setStatus] = useState<RunStatus>(runId ? "running" : "idle");
+  const [events, setEvents] = useState<AgentEvent[]>([]);
+  const feedRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!runId) return;
+
+    const eventSource = new EventSource(`${API_URL}/api/runs/${runId}/stream`);
+
+    eventSource.onmessage = (e) => {
+      const event: AgentEvent = JSON.parse(e.data);
+
+      if (event.type === "done") {
+        setStatus((prev: RunStatus) => (prev === "running" ? "completed" : prev));
+        eventSource.close();
+        return;
+      }
+
+      if (event.type === "error") {
+        setStatus("error");
+      }
+
+      setEvents((prev: AgentEvent[]) => [...prev, event]);
+    };
+
+    eventSource.onerror = () => {
+      eventSource.close();
+      setStatus((prev: RunStatus) => (prev === "running" ? "error" : prev));
+    };
+
+    return () => eventSource.close();
+  }, [runId]);
+
+  useEffect(() => {
+    if (feedRef.current) {
+      feedRef.current.scrollTop = feedRef.current.scrollHeight;
+    }
+  }, [events]);
+
+  const statusConfig: Record<RunStatus, { color: string; label: string }> = {
+    idle: { color: "bg-amber-500/80", label: "Idle" },
+    running: { color: "bg-emerald-500", label: "Running" },
+    completed: { color: "bg-blue-500", label: "Completed" },
+    error: { color: "bg-red-500", label: "Error" },
+  };
+
+  const { color, label } = statusConfig[status];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -66,9 +147,13 @@ export default function DashboardPage() {
               Home
             </Link>
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-amber-500/80 animate-pulse" />
+              <span
+                className={`h-2 w-2 rounded-full ${color} ${
+                  status === "running" ? "animate-pulse" : ""
+                }`}
+              />
               <span className="text-xs font-mono text-muted-foreground">
-                Idle
+                {label}
               </span>
             </div>
           </nav>
@@ -116,20 +201,25 @@ export default function DashboardPage() {
                     Agent feed
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="rounded-md border border-border bg-muted/50 p-3"
-                    >
-                      <span className="text-xs font-mono text-primary">
-                        Turn {i}
-                      </span>
-                      <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                        Placeholder for agent decisions. Connect realtime.
+                <CardContent>
+                  <div
+                    ref={feedRef}
+                    className="max-h-[400px] space-y-2 overflow-y-auto pr-1"
+                  >
+                    {events.length === 0 && status === "idle" && (
+                      <p className="text-xs text-muted-foreground py-4 text-center">
+                        No active run. Launch from the home page.
                       </p>
-                    </div>
-                  ))}
+                    )}
+                    {events.length === 0 && status === "running" && (
+                      <p className="text-xs text-muted-foreground py-4 text-center animate-pulse">
+                        Waiting for agent…
+                      </p>
+                    )}
+                    {events.map((event, i) => (
+                      <FeedItem key={i} event={event} index={i} />
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
 
@@ -157,6 +247,46 @@ export default function DashboardPage() {
         </Tabs>
       </main>
     </div>
+  );
+}
+
+function FeedItem({ event, index }: { event: AgentEvent; index: number }) {
+  const iconMap: Record<string, React.ReactNode> = {
+    assistant_text: <Terminal className="size-3 shrink-0 text-emerald-400" />,
+    tool_use: <Wrench className="size-3 shrink-0 text-blue-400" />,
+    result: <CheckCircle2 className="size-3 shrink-0 text-blue-400" />,
+    error: <AlertCircle className="size-3 shrink-0 text-red-400" />,
+  };
+
+  const labelMap: Record<string, string> = {
+    assistant_text: "Agent",
+    tool_use: "Tool",
+    result: "Result",
+    error: "Error",
+  };
+
+  const truncated =
+    event.type === "assistant_text" && event.content && event.content.length > 200
+      ? event.content.slice(0, 200) + "…"
+      : event.content;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.15 }}
+      className="rounded-md border border-border bg-muted/50 p-3"
+    >
+      <div className="flex items-center gap-1.5">
+        {iconMap[event.type]}
+        <span className="text-xs font-mono text-primary">
+          {labelMap[event.type] ?? event.type} #{index + 1}
+        </span>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground whitespace-pre-wrap wrap-break-word">
+        {truncated}
+      </p>
+    </motion.div>
   );
 }
 

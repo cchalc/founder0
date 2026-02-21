@@ -1,12 +1,46 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+
 export default function Home() {
+  const router = useRouter();
+  const [vision, setVision] = useState("");
+  const [launching, setLaunching] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleLaunch() {
+    if (!vision.trim() || launching) return;
+    setLaunching(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`${API_URL}/api/launch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vision: vision.trim() }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error ?? `Server error (${res.status})`);
+      }
+
+      const { runId } = await res.json();
+      router.push(`/dashboard?runId=${runId}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to start run");
+      setLaunching(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -70,11 +104,33 @@ export default function Home() {
             placeholder="e.g. A subscription box for busy parents who want healthy meal prep..."
             rows={4}
             className="min-h-[120px] resize-none"
+            value={vision}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setVision(e.target.value)}
+            disabled={launching}
           />
+
+          {error && (
+            <p className="mt-3 text-sm text-red-400">{error}</p>
+          )}
+
           <div className="mt-6 flex gap-4">
-            <Button size="lg" className="gap-2">
-              Launch Run
-              <ArrowRight className="size-4" />
+            <Button
+              size="lg"
+              className="gap-2"
+              onClick={handleLaunch}
+              disabled={!vision.trim() || launching}
+            >
+              {launching ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Launching…
+                </>
+              ) : (
+                <>
+                  Launch Run
+                  <ArrowRight className="size-4" />
+                </>
+              )}
             </Button>
             <Button variant="outline" size="lg" className="gap-2">
               <Play className="size-4" />
