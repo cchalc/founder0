@@ -21,7 +21,7 @@ No Anthropic API key needed — Agent SDK uses your Claude Code subscription.
 
 ---
 
-## Person A — Agent Core
+## Person A — Agent Core (Jimmy)
 
 **Hour 1:** Install Agent SDK. Write a test: agent creates a file + runs a bash command. Confirm it works. Start drafting the system prompt (founder playbook: research → build → deploy → monetize → market).
 
@@ -33,7 +33,7 @@ No Anthropic API key needed — Agent SDK uses your Claude Code subscription.
 
 ---
 
-## Person B — Browser Tool (Browserbase + Stagehand)
+## Person B — Browser Tool (Browserbase + Stagehand) (Angela)
 
 **Hour 1:** Set up Browserbase. Get a session launching. Test Stagehand `act("click the login button")` on a simple site.
 
@@ -45,7 +45,7 @@ No Anthropic API key needed — Agent SDK uses your Claude Code subscription.
 
 ---
 
-## Person C — Stripe Tool + Co-pilot
+## Person C — Stripe Tool + Co-pilot (Elijah)
 
 **Hour 1:** Build `create_checkout` tool (Stripe SDK → returns payment URL). Test with card `4242 4242 4242 4242`. Build `log_turn` tool (writes to Supabase turns table).
 
@@ -57,7 +57,7 @@ No Anthropic API key needed — Agent SDK uses your Claude Code subscription.
 
 ---
 
-## Person D — Dashboard + Demo Director
+## Person D — Dashboard + Demo Director (Chris)
 
 **Hour 1:** Supabase: create `turns` table + `commands` table. Build a simple HTML page with realtime subscription — scrolling feed of agent decisions. Create burner X account, give creds to Person B.
 
