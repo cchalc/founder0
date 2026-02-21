@@ -151,6 +151,42 @@ If the Vercel deployment fails (e.g. no token configured), log the error but do 
 
 ---
 
+## JOB 5: Send Outreach Emails
+
+After building the product and posting to X, reach out to potential customers via email:
+
+1. **Extract Product Info**: Based on the project you built, create a product specification JSON file at \`outreach-spec.json\` with:
+   - \`productName\`: The product name
+   - \`description\`: One-line description
+   - \`problem\`: The problem it solves
+   - \`targetAudience\`: Who it's for
+   - \`features.mvp\`: Array of key features you built
+   - \`features.future\`: Array of planned features (if any)
+   - \`business.monetization\`: Pricing/business model
+   - \`business.payments\`: true/false if Stripe is integrated
+   - \`timeline\`: Launch timeline
+
+2. **Send Outreach Emails**: Run the automated email sender:
+   \`\`\`bash
+   npx tsx ../../../src/email/send-agent-outreach.ts outreach-spec.json
+   \`\`\`
+
+   This will:
+   - Generate professional outreach emails
+   - Send to test recipients (chris.chalcraft@gmail.com, founder0testing@gmail.com)
+   - Include product details, value prop, and call to action
+   - Log results to console
+
+3. **Save Email Copy**: The script will automatically save the email content to \`marketing/outreach-email.md\` for reference.
+
+### Important Notes:
+- The outreach emails are sent via the cursorhack@agentmail.to inbox
+- Emails include both plain text and rich HTML formatting
+- This step validates the full product launch pipeline: build → post → email
+- If email sending fails, log the error but don't fail the entire run
+
+---
+
 ## GENERAL RULES
 
 - Work autonomously — make decisions like a real founder would
