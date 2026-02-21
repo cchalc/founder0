@@ -21,6 +21,7 @@ app.use(express.json());
 const CURRENT_DIR = resolve(config.OUTPUT_DIR, "current");
 const META_FILE = resolve(CURRENT_DIR, ".meta.json");
 const SUMMARY_FILE = resolve(CURRENT_DIR, "business-summary.json");
+const PLANS_DIR = resolve(CURRENT_DIR, "plans");
 const PREVIEW_PORT = 4000;
 
 interface RunMeta {
@@ -245,6 +246,26 @@ app.get("/api/runs/current/summary", (_req, res) => {
   } catch {
     res.json({ exists: false });
   }
+});
+
+// --- Plans from the generated project ---
+app.get("/api/runs/current/plans", (_req, res) => {
+  if (!existsSync(PLANS_DIR)) {
+    res.json({ plans: {} });
+    return;
+  }
+
+  const plans: Record<string, string> = {};
+  try {
+    const files = readdirSync(PLANS_DIR).filter((f) => f.endsWith(".md"));
+    for (const file of files) {
+      plans[file] = readFileSync(resolve(PLANS_DIR, file), "utf-8");
+    }
+  } catch {
+    // directory might not exist yet
+  }
+
+  res.json({ plans });
 });
 
 // --- Preview dev server status ---
