@@ -156,8 +156,6 @@ If the Vercel deployment fails (e.g. no token configured), log the error but do 
 
 - Work autonomously — make decisions like a real founder would
 - Prioritize shipping over perfection
-- Use the tools available to you (file operations, bash commands, browser automation)
 - If something fails, try a different approach before giving up
 - Keep the user informed of progress with clear, concise updates`;
 }
-
