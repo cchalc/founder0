@@ -1,5 +1,6 @@
 import "dotenv/config";
-import { resolve } from "node:path";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   mkdirSync,
   rmSync,
@@ -7,12 +8,17 @@ import {
   writeFileSync,
   readFileSync,
   readdirSync,
+  statSync,
+  createReadStream,
 } from "node:fs";
 import { spawn, type ChildProcess } from "node:child_process";
 import express from "express";
 import cors from "cors";
 import { config } from "./agent-core/config.js";
 import { runFounderAgent, type AgentEvent } from "./agent-core/pipeline.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const RECORDINGS_DIR = resolve(__dirname, "..", "recordings");
 
 const app = express();
 app.use(cors());
@@ -269,6 +275,57 @@ app.post("/api/runs/current/start-preview", (_req, res) => {
   }
   startPreview();
   res.json({ ok: true, port: PREVIEW_PORT });
+});
+
+// --- Latest session recording ---
+app.get("/api/recordings/latest", (_req, res) => {
+  if (!existsSync(RECORDINGS_DIR)) {
+    res.json({ available: false });
+    return;
+  }
+
+  try {
+    const files = readdirSync(RECORDINGS_DIR)
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => ({
+        name: f,
+        mtime: statSync(resolve(RECORDINGS_DIR, f)).mtimeMs,
+      }))
+      .sort((a, b) => b.mtime - a.mtime);
+
+    if (files.length === 0) {
+      res.json({ available: false });
+      return;
+    }
+
+    const latest = files[0];
+    res.json({
+      available: true,
+      filename: latest.name,
+      url: `/api/recordings/file/${latest.name}`,
+    });
+  } catch {
+    res.json({ available: false });
+  }
+});
+
+// --- Serve recording events file ---
+app.get("/api/recordings/file/:filename", (req, res) => {
+  const filename = req.params.filename;
+  // Prevent directory traversal
+  if (filename.includes("..") || filename.includes("/")) {
+    res.status(400).json({ error: "Invalid filename" });
+    return;
+  }
+
+  const filepath = resolve(RECORDINGS_DIR, filename);
+  if (!existsSync(filepath)) {
+    res.status(404).json({ error: "Recording not found" });
+    return;
+  }
+
+  res.setHeader("Content-Type", "application/json");
+  createReadStream(filepath).pipe(res);
 });
 
 // Legacy compat: redirect old /api/runs/:runId to current

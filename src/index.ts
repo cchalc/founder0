@@ -1,5 +1,6 @@
 // Browser
 export { createSession, getSession, closeSession, closeAllSessions, listSessions } from "./browser/session-manager.js";
+export { saveSessionRecording } from "./browser/recording-manager.js";
 export { browserAction, type BrowserActionResult, type BrowserActionOptions } from "./browser/browser-tool.js";
 
 // Email

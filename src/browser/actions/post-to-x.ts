@@ -219,6 +219,29 @@ export async function postToX(options: PostToXOptions): Promise<PostToXResult> {
     }
     await humanDelay(3000, 4000);
 
+    // TODO: X sometimes shows a popup/modal after posting (e.g. "Got it" or promotional dialogs).
+    // Dismiss it so the page is in a clean state. Thread posting is disabled until this is reliable.
+    try {
+      const dismissed = await page.evaluate(() => {
+        // Look for common dismiss buttons in popups/modals
+        const selectors = [
+          '[data-testid="sheetDialog"] [role="button"]',
+          '[data-testid="app-bar-close"]',
+          '[aria-label="Close"]',
+          '[aria-label="Got it"]',
+        ];
+        for (const sel of selectors) {
+          const el = document.querySelector(sel) as HTMLElement;
+          if (el) { el.click(); return true; }
+        }
+        return false;
+      });
+      if (dismissed) {
+        console.log("[post-to-x] Dismissed post-tweet popup");
+        await humanDelay(1000, 1500);
+      }
+    } catch { /* no popup to dismiss */ }
+
     const screenshotBuffer = await page.screenshot({ type: "jpeg", quality: 75 });
     const screenshot = screenshotBuffer.toString("base64");
     console.log("[post-to-x] Done.");

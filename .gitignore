@@ -144,3 +144,7 @@ output/
 # Browserbase context & cookies
 .browserbase-context
 cookies-x.json
+
+# Session recordings (can be large)
+recordings/*.json
+recordings/*.webm

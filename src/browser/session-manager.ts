@@ -1,10 +1,12 @@
 import { Stagehand } from "@browserbasehq/stagehand";
+import { saveSessionRecording } from "./recording-manager.js";
 import "dotenv/config";
 
 export interface SessionInfo {
   stagehand: Stagehand;
   sessionId: string;
   createdAt: Date;
+  recordingLabel?: string;
 }
 
 export interface CreateSessionOptions {
@@ -12,6 +14,8 @@ export interface CreateSessionOptions {
   contextId?: string;
   /** Whether to save browser data back to the context when the session closes. Defaults to false. */
   persist?: boolean;
+  /** Optional label for the recording file (e.g. "post-to-x", "signup"). */
+  recordingLabel?: string;
 }
 
 const sessions = new Map<string, SessionInfo>();
@@ -21,7 +25,7 @@ let sessionCounter = 0;
 export async function createSession(
   options: CreateSessionOptions = {},
 ): Promise<SessionInfo> {
-  const { contextId, persist } = options;
+  const { contextId, persist, recordingLabel } = options;
 
   const browserSettings: Record<string, unknown> = {
     blockAds: true,
@@ -58,6 +62,7 @@ export async function createSession(
     stagehand,
     sessionId,
     createdAt: new Date(),
+    recordingLabel,
   };
 
   sessions.set(sessionId, info);
@@ -75,6 +80,11 @@ export async function closeSession(sessionId: string): Promise<void> {
   await info.stagehand.close();
   sessions.delete(sessionId);
   console.log(`[session-manager] Closed session ${sessionId}`);
+
+  // Download the recording in the background (don't block on failure)
+  if (!sessionId.startsWith("local-")) {
+    saveSessionRecording(sessionId, info.recordingLabel).catch(() => {});
+  }
 }
 
 export async function closeAllSessions(): Promise<void> {

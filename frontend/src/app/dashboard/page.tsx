@@ -276,6 +276,7 @@ function DashboardContent() {
             </TabsContent>
 
             {/* Plan-based tabs */}
+            {/* TODO: re-add session replay (Browserbase rrweb) to social tab once recordings are reliably saved */}
             <TabsContent value="social" className="mt-0 h-full overflow-y-auto p-6">
               <PlanTab
                 title="Social Media"
