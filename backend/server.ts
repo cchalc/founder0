@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { resolve } from "node:path";
 import { mkdirSync } from "node:fs";
-import { randomUUID } from "node:crypto";
 import express from "express";
 import cors from "cors";
 import { config } from "./agent-core/config.js";
@@ -30,8 +29,8 @@ app.post("/api/launch", (req, res) => {
     return;
   }
 
-  const id = randomUUID();
-  const outputDir = resolve(config.OUTPUT_DIR, id);
+  const id = String(Date.now());
+  const outputDir = resolve(config.OUTPUT_DIR);
   mkdirSync(outputDir, { recursive: true });
 
   const run: Run = {
