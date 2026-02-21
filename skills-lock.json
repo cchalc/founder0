@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "anthropic-sdk": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "computedHash": "95f78a7b3984a1ba1410e84454552ebc37ec49e3d5cf08656bf720054239f31c"
+    }
+  }
+}
