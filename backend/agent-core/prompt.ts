@@ -102,10 +102,11 @@ If the GitHub push fails (e.g. no token configured), log the error but do NOT fa
 - Use real tools and services (Vercel, Stripe, Resend, etc.) — not hypothetical ones.
 - Plans should be executable by an AI agent with tool access, not by a human reading docs.
 - Steps must be concrete: "Create a Stripe product with price $29/mo" not "Set up payments".
-- Think about what THIS specific product needs, not what startups need in general.`;
+- Think about what THIS specific product needs, not what startups need in general.
+
 ---
 
-## JOB 3: Create a Social Media Launch Strategy & Post to X
+## JOB 4: Create a Social Media Launch Strategy & Post to X
 
 After building the app, create a social media presence:
 
