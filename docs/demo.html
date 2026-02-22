@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Founder Agent Live Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============ THEME: Editorial Paper ============ */
+  :root {
+    --font-serif: 'Instrument Serif', Georgia, serif;
+    --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+
+    --bg: #fdfbf7;
+    --surface: #ffffff;
+    --surface2: #f7f3eb;
+    --border: rgba(44, 37, 28, 0.08);
+    --border-bright: rgba(44, 37, 28, 0.16);
+    --text: #2c251c;
+    --text-dim: #6b5e4f;
+
+    --primary: #d97706;
+    --primary-dim: rgba(217, 119, 6, 0.08);
+    --secondary: #059669;
+    --secondary-dim: rgba(5, 150, 105, 0.08);
+    --accent: #dc2626;
+    --accent-dim: rgba(220, 38, 38, 0.08);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1814;
+      --surface: #2c251c;
+      --surface2: #3d352a;
+      --border: rgba(253, 251, 247, 0.1);
+      --border-bright: rgba(253, 251, 247, 0.2);
+      --text: #fdfbf7;
+      --text-dim: #d4c5b0;
+
+      --primary: #fbbf24;
+      --primary-dim: rgba(251, 191, 36, 0.12);
+      --secondary: #34d399;
+      --secondary-dim: rgba(52, 211, 153, 0.12);
+      --accent: #f87171;
+      --accent-dim: rgba(248, 113, 113, 0.12);
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    padding: 80px 40px;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ============ ANIMATION ============ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate {
+    animation: fadeUp 0.5s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.08s);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-delay: 0ms !important; }
+  }
+
+  /* ============ LAYOUT ============ */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 64px;
+    font-weight: 400;
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 48px;
+  }
+
+  .intro {
+    font-size: 20px;
+    line-height: 1.8;
+    color: var(--text-dim);
+    margin-bottom: 60px;
+    font-family: var(--font-serif);
+  }
+
+  /* ============ SECTIONS ============ */
+  .section {
+    margin-bottom: 80px;
+  }
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: 36px;
+    font-weight: 400;
+    margin-bottom: 24px;
+    color: var(--primary);
+  }
+
+  .section-desc {
+    font-size: 16px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    line-height: 1.8;
+  }
+
+  /* ============ TIMELINE ============ */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 40px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -47px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid var(--bg);
+  }
+
+  .timeline-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .timeline-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+
+  .timeline-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .timeline-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .timeline-code {
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--surface2);
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: var(--text-dim);
+    overflow-x: auto;
+  }
+
+  /* ============ COMPARISON ============ */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .comparison-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+  }
+
+  .comparison-card h3 {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .comparison-card ul {
+    list-style: none;
+  }
+
+  .comparison-card li {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    padding-left: 24px;
+    position: relative;
+  }
+
+  .comparison-card li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+  }
+
+  .comparison-card--before { border-left: 3px solid var(--accent); }
+  .comparison-card--after { border-left: 3px solid var(--secondary); }
+
+  /* ============ OUTPUTS ============ */
+  .outputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .output-badge {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .output-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .output-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 768px) {
+    body { padding: 40px 20px; }
+    h1 { font-size: 36px; }
+    h2 { font-size: 24px; }
+    .comparison { grid-template-columns: 1fr; }
+    .outputs { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1 class="animate" style="--i:0">Live Demo Walkthrough</h1>
+  <p class="subtitle animate" style="--i:1">What happens when you launch</p>
+
+  <p class="intro animate" style="--i:2">
+    Watch an idea transform into a launched product in real-time. The dashboard streams every decision,
+    action, and result as the agent autonomously builds, deploys, and markets your product.
+  </p>
+
+  <!-- Input Section -->
+  <div class="section animate" style="--i:3">
+    <h2>1. User Input</h2>
+    <p class="section-desc">
+      You provide a single product vision. No configuration, no technical specs—just the idea.
+    </p>
+    <div class="timeline-content">
+      <div class="timeline-code">
+        "Build a task management app for remote teams with AI-powered priority recommendations"
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent Actions -->
+  <div class="section animate" style="--i:4">
+    <h2>2. Real-Time Event Stream</h2>
+    <p class="section-desc">
+      The dashboard shows every decision the agent makes. Each event represents autonomous reasoning and execution.
+    </p>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-label">00:15</div>
+        <div class="timeline-content">
+          <div class="timeline-title">🤖 Planning project structure</div>
+          <div class="timeline-desc">
+            Agent analyzes requirements and decides on Next.js with TypeScript, Tailwind CSS, and Vercel deployment
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-label">00:42</div>
+        <div class="timeline-content">
+          <div class="timeline-title">📝 Scaffolding application</div>
+          <div class="timeline-desc">
+            Creating package.json, Next.js app structure, components, and landing page
+          </div>
+          <div class="timeline-code">✓ git init<br>✓ package.json created<br>✓ src/app/page.tsx written</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-label">01:18</div>
+        <div class="timeline-content">
+          <div class="timeline-title">📋 Generating strategic plans</div>
+          <div class="timeline-desc">
+            Creating marketing strategy, monetization plan, launch checklist, and social media content
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-label">01:45</div>
+        <div class="timeline-content">
+          <div class="timeline-title">🚀 Deploying to production</div>
+          <div class="timeline-desc">
+            GitHub repository created, code pushed, Vercel deployment triggered
+          </div>
+          <div class="timeline-code">✓ https://taskflow-ai.vercel.app</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-label">02:03</div>
+        <div class="timeline-content">
+          <div class="timeline-title">🐦 Posting launch tweet</div>
+          <div class="timeline-desc">
+            Browser automation: authenticating, composing tweet, publishing to X/Twitter
+          </div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-label">02:20</div>
+        <div class="timeline-content">
+          <div class="timeline-title">📧 Sending outreach emails</div>
+          <div class="timeline-desc">
+            Generating professional outreach emails, sending to test recipients
+          </div>
+          <div class="timeline-code">✓ Sent to 2 recipients</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Outputs -->
+  <div class="section animate" style="--i:5">
+    <h2>3. Delivered Outputs</h2>
+    <p class="section-desc">
+      Everything the agent creates is real, functional, and ready to use.
+    </p>
+    <div class="outputs">
+      <div class="output-badge">
+        <div class="output-icon">🌐</div>
+        <div class="output-label">Live Production URL</div>
+      </div>
+      <div class="output-badge">
+        <div class="output-icon">🐙</div>
+        <div class="output-label">GitHub Repository</div>
+      </div>
+      <div class="output-badge">
+        <div class="output-icon">📝</div>
+        <div class="output-label">Strategic Plans</div>
+      </div>
+      <div class="output-badge">
+        <div class="output-icon">🐦</div>
+        <div class="output-label">Social Media Posts</div>
+      </div>
+      <div class="output-badge">
+        <div class="output-icon">📧</div>
+        <div class="output-label">Outreach Emails</div>
+      </div>
+      <div class="output-badge">
+        <div class="output-icon">💳</div>
+        <div class="output-label">Payment Integration</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Before/After -->
+  <div class="section animate" style="--i:6">
+    <h2>4. Before vs. After</h2>
+    <p class="section-desc">
+      Founder Agent collapses weeks of work into minutes of autonomous execution.
+    </p>
+    <div class="comparison">
+      <div class="comparison-card comparison-card--before">
+        <h3>Before</h3>
+        <ul>
+          <li>Days setting up infrastructure</li>
+          <li>Writing boilerplate code</li>
+          <li>Configuring deployments</li>
+          <li>Creating marketing assets</li>
+          <li>Manual social posting</li>
+          <li>Crafting outreach emails</li>
+          <li>Week 1: Still not launched</li>
+        </ul>
+      </div>
+      <div class="comparison-card comparison-card--after">
+        <h3>After</h3>
+        <ul>
+          <li>Enter product vision</li>
+          <li>Click "Launch"</li>
+          <li>Watch real-time progress</li>
+          <li>Minute 2: Live on Vercel</li>
+          <li>Minute 2: Posted on X</li>
+          <li>Minute 2: Emails sent</li>
+          <li>Minute 3: Collecting feedback</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

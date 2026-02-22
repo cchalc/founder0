@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Founder Agent Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============ THEME: Neon Dashboard ============ */
+  :root {
+    --font-body: 'Space Grotesk', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+    --bg: #0a0e27;
+    --surface: #131829;
+    --surface2: #1a2035;
+    --border: rgba(139, 92, 246, 0.15);
+    --border-bright: rgba(139, 92, 246, 0.3);
+    --text: #e0e7ff;
+    --text-dim: #a5b4fc;
+
+    --primary: #8b5cf6;
+    --primary-glow: rgba(139, 92, 246, 0.2);
+    --secondary: #06b6d4;
+    --secondary-glow: rgba(6, 182, 212, 0.2);
+    --tertiary: #f59e0b;
+    --tertiary-glow: rgba(245, 158, 11, 0.2);
+    --accent: #ec4899;
+    --accent-glow: rgba(236, 72, 153, 0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+    color: var(--text);
+    font-family: var(--font-body);
+    padding: 60px 40px;
+    min-height: 100vh;
+  }
+
+  /* ============ ANIMATION ============ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px var(--primary-glow), 0 0 40px var(--primary-glow); }
+    50% { box-shadow: 0 0 30px var(--primary-glow), 0 0 60px var(--primary-glow); }
+  }
+
+  .animate {
+    animation: fadeUp 0.6s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.08s);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-delay: 0ms !important; }
+  }
+
+  /* ============ LAYOUT ============ */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 56px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    margin-bottom: 48px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .description {
+    font-size: 18px;
+    line-height: 1.8;
+    color: var(--text-dim);
+    margin-bottom: 48px;
+    max-width: 800px;
+  }
+
+  /* ============ ARCHITECTURE GRID ============ */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .arch-layer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .arch-layer:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-4px);
+  }
+
+  .arch-layer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color) 0%, transparent 100%);
+  }
+
+  .arch-layer--primary { --color: var(--primary); }
+  .arch-layer--secondary { --color: var(--secondary); }
+  .arch-layer--tertiary { --color: var(--tertiary); }
+  .arch-layer--accent { --color: var(--accent); }
+
+  .layer-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px var(--color);
+  }
+
+  .layer-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .layer-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .layer-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tech-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 6px;
+    color: var(--primary);
+  }
+
+  /* ============ FULL-WIDTH LAYERS ============ */
+  .arch-layer--full {
+    grid-column: span 3;
+  }
+
+  .layer-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .feature-item::before {
+    content: '→';
+    color: var(--color);
+    font-weight: bold;
+  }
+
+  /* ============ CONNECTION ARROWS ============ */
+  .connections {
+    position: relative;
+    height: 60px;
+    margin: -12px 0 24px 0;
+  }
+
+  .arrow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+  }
+
+  .arrow::after {
+    content: '▼';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--secondary);
+    font-size: 12px;
+  }
+
+  /* ============ STATS ============ */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 48px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 968px) {
+    .arch-grid { grid-template-columns: 1fr; }
+    .arch-layer--full { grid-column: span 1; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1 class="animate" style="--i:0">Founder Agent</h1>
+  <p class="subtitle animate" style="--i:1">System Architecture</p>
+
+  <p class="description animate" style="--i:2">
+    An autonomous AI system that transforms product ideas into launched businesses. The architecture combines
+    Claude's reasoning engine with specialized automation tools for code generation, deployment, browser control,
+    and customer outreach.
+  </p>
+
+  <!-- Layer 1: Frontend -->
+  <div class="arch-grid">
+    <div class="arch-layer arch-layer--full arch-layer--primary animate" style="--i:3">
+      <div class="layer-icon">🎨</div>
+      <h3 class="layer-title">Frontend Dashboard</h3>
+      <p class="layer-desc">
+        Real-time visualization of agent decisions. Streams events via Server-Sent Events, displays
+        live progress, and provides chat interface for requirements gathering.
+      </p>
+      <div class="layer-tech">
+        <span class="tech-badge">Next.js 16</span>
+        <span class="tech-badge">App Router</span>
+        <span class="tech-badge">SSE</span>
+        <span class="tech-badge">Tailwind CSS</span>
+        <span class="tech-badge">TypeScript</span>
+      </div>
+      <div class="layer-features">
+        <div class="feature-item">Real-time event streaming</div>
+        <div class="feature-item">Requirements chat (Kimi API)</div>
+        <div class="feature-item">Live progress visualization</div>
+        <div class="feature-item">Generated output preview</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connections">
+    <div class="arrow"></div>
+  </div>
+
+  <!-- Layer 2: Backend Agent -->
+  <div class="arch-grid">
+    <div class="arch-layer arch-layer--full arch-layer--secondary animate" style="--i:4">
+      <div class="layer-icon">🧠</div>
+      <h3 class="layer-title">Backend Agent Server</h3>
+      <p class="layer-desc">
+        Express server hosting the autonomous agent loop. Uses Claude Agent SDK for reasoning,
+        tool selection, and execution. Manages project lifecycle from scaffold to deployment.
+      </p>
+      <div class="layer-tech">
+        <span class="tech-badge">Express.js</span>
+        <span class="tech-badge">Claude Agent SDK</span>
+        <span class="tech-badge">Server-Sent Events</span>
+        <span class="tech-badge">TypeScript</span>
+      </div>
+      <div class="layer-features">
+        <div class="feature-item">Autonomous reasoning loop</div>
+        <div class="feature-item">Tool execution (Write, Edit, Read, Bash)</div>
+        <div class="feature-item">Event streaming to frontend</div>
+        <div class="feature-item">Project output management</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connections">
+    <div class="arrow"></div>
+  </div>
+
+  <!-- Layer 3: Specialized Tools -->
+  <div class="arch-grid">
+    <div class="arch-layer arch-layer--tertiary animate" style="--i:5">
+      <div class="layer-icon">⚡</div>
+      <h3 class="layer-title">Code & Deploy</h3>
+      <p class="layer-desc">
+        File operations, Git automation, and deployment orchestration via Vercel CLI.
+      </p>
+      <div class="layer-tech">
+        <span class="tech-badge">File System</span>
+        <span class="tech-badge">Git/GitHub CLI</span>
+        <span class="tech-badge">Vercel CLI</span>
+      </div>
+      <div class="layer-features">
+        <div class="feature-item">Scaffold projects</div>
+        <div class="feature-item">Create repositories</div>
+        <div class="feature-item">Deploy to production</div>
+      </div>
+    </div>
+
+    <div class="arch-layer arch-layer--accent animate" style="--i:6">
+      <div class="layer-icon">🌐</div>
+      <h3 class="layer-title">Browser Agent</h3>
+      <p class="layer-desc">
+        Cloud-based Chrome automation for social media posting and web interactions.
+      </p>
+      <div class="layer-tech">
+        <span class="tech-badge">Browserbase</span>
+        <span class="tech-badge">Stagehand</span>
+        <span class="tech-badge">X/Twitter</span>
+      </div>
+      <div class="layer-features">
+        <div class="feature-item">Post launch tweets</div>
+        <div class="feature-item">Account creation</div>
+        <div class="feature-item">Session replays</div>
+      </div>
+    </div>
+
+    <div class="arch-layer arch-layer--primary animate" style="--i:7">
+      <div class="layer-icon">📧</div>
+      <h3 class="layer-title">Email & Outreach</h3>
+      <p class="layer-desc">
+        Automated customer outreach with professional email templates and delivery tracking.
+      </p>
+      <div class="layer-tech">
+        <span class="tech-badge">AgentMail</span>
+        <span class="tech-badge">HTML Templates</span>
+      </div>
+      <div class="layer-features">
+        <div class="feature-item">Generate outreach emails</div>
+        <div class="feature-item">Send to recipients</div>
+        <div class="feature-item">Track delivery</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats animate" style="--i:8">
+    <div class="stat-card">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Core Components</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">7</div>
+      <div class="stat-label">Integrated APIs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">∞</div>
+      <div class="stat-label">Autonomous Actions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">1</div>
+      <div class="stat-label">Human Input</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

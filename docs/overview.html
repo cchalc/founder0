@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Founder Agent - The Big Picture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0118;
+    --surface: #1a0f2e;
+    --text: #f8f9fa;
+    --text-dim: #d4d4d8;
+    --primary: #a855f7;
+    --secondary: #06b6d4;
+    --accent: #f97316;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: radial-gradient(circle at 20% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    padding: 80px 40px;
+    min-height: 100vh;
+  }
+
+  @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+  .animate { animation: fadeUp 0.8s ease-out both; animation-delay: calc(var(--i, 0) * 0.1s); }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1 {
+    font-size: 64px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .tagline {
+    font-size: 24px;
+    color: var(--text-dim);
+    margin-bottom: 80px;
+    font-weight: 500;
+  }
+
+  /* Hero Section */
+  .hero {
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(26, 15, 46, 0.5) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 24px;
+    padding: 60px;
+    margin-bottom: 80px;
+    text-align: center;
+  }
+
+  .hero-emoji {
+    font-size: 80px;
+    margin-bottom: 32px;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .hero-text {
+    font-size: 32px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+
+  .hero-subtext {
+    font-size: 18px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  /* Simple Flow */
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-bottom: 80px;
+  }
+
+  .flow-step {
+    background: var(--surface);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+
+  .flow-step:hover { transform: translateY(-8px); }
+
+  .flow-number {
+    width: 48px;
+    height: 48px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 auto 24px;
+  }
+
+  .flow-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .flow-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  /* Impact Grid */
+  .impact-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    margin-bottom: 80px;
+  }
+
+  .impact-card {
+    background: var(--surface);
+    border-left: 4px solid var(--color);
+    border-radius: 16px;
+    padding: 40px;
+  }
+
+  .impact-card--time { --color: var(--primary); }
+  .impact-card--barriers { --color: var(--secondary); }
+  .impact-card--ideas { --color: var(--accent); }
+  .impact-card--focus { --color: #10b981; }
+
+  .impact-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color);
+    margin-bottom: 12px;
+  }
+
+  .impact-value {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .impact-desc {
+    font-size: 16px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    text-align: center;
+  }
+
+  .stat {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 32px 24px;
+  }
+
+  .stat-value {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 968px) {
+    body { padding: 40px 20px; }
+    h1 { font-size: 36px; }
+    .tagline { font-size: 18px; }
+    .hero { padding: 40px 32px; }
+    .flow { grid-template-columns: 1fr; }
+    .impact-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1 class="animate" style="--i:0">Founder Agent</h1>
+  <p class="tagline animate" style="--i:1">From Idea to Launched Product in Minutes</p>
+
+  <!-- Hero -->
+  <div class="hero animate" style="--i:2">
+    <div class="hero-emoji">🚀</div>
+    <div class="hero-text">
+      The first AI that autonomously launches real products
+    </div>
+    <div class="hero-subtext">
+      Give it a vision. Watch it build the code, deploy to production, post to social media,
+      and send customer emails—all on its own.
+    </div>
+  </div>
+
+  <!-- Simple Flow -->
+  <div class="flow">
+    <div class="flow-step animate" style="--i:3">
+      <div class="flow-number">1</div>
+      <div class="flow-title">Enter Your Vision</div>
+      <div class="flow-desc">
+        Describe what you want to build in one sentence. No technical knowledge required.
+      </div>
+    </div>
+
+    <div class="flow-step animate" style="--i:4">
+      <div class="flow-number">2</div>
+      <div class="flow-title">Agent Does Everything</div>
+      <div class="flow-desc">
+        Writes code, creates GitHub repo, deploys to production, posts to X, sends outreach emails.
+      </div>
+    </div>
+
+    <div class="flow-step animate" style="--i:5">
+      <div class="flow-number">3</div>
+      <div class="flow-title">Product is Live</div>
+      <div class="flow-desc">
+        Real URL, actual social posts, sent emails. Ready for customers in minutes, not weeks.
+      </div>
+    </div>
+  </div>
+
+  <!-- Impact -->
+  <div class="impact-grid">
+    <div class="impact-card impact-card--time animate" style="--i:6">
+      <div class="impact-label">Time Saved</div>
+      <div class="impact-value">Weeks → Minutes</div>
+      <div class="impact-desc">
+        What used to take weeks of setup, coding, and configuration now happens in minutes.
+      </div>
+    </div>
+
+    <div class="impact-card impact-card--barriers animate" style="--i:7">
+      <div class="impact-label">Barriers Removed</div>
+      <div class="impact-value">Zero Code</div>
+      <div class="impact-desc">
+        Non-technical founders can launch products without hiring developers or learning to code.
+      </div>
+    </div>
+
+    <div class="impact-card impact-card--ideas animate" style="--i:8">
+      <div class="impact-label">Idea Validation</div>
+      <div class="impact-value">10× Faster</div>
+      <div class="impact-desc">
+        Test 10 product ideas in the time it used to take to build one. Fail fast, learn faster.
+      </div>
+    </div>
+
+    <div class="impact-card impact-card--focus animate" style="--i:9">
+      <div class="impact-label">Focus Shift</div>
+      <div class="impact-value">Strategy > Code</div>
+      <div class="impact-desc">
+        Spend time on what matters: talking to customers, refining the vision, not writing boilerplate.
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats animate" style="--i:10">
+    <div class="stat">
+      <div class="stat-value">1</div>
+      <div class="stat-label">Input Required</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Automated Steps</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">∞</div>
+      <div class="stat-label">Possibilities</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">100%</div>
+      <div class="stat-label">Autonomous</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

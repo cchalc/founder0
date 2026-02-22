@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Founder Agent - Presentation Materials</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --text: #f1f5f9;
+    --text-dim: #cbd5e1;
+    --primary: #8b5cf6;
+    --secondary: #06b6d4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 80px 40px;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  h1 {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: 20px;
+    color: var(--text-dim);
+    margin-bottom: 60px;
+  }
+
+  .section {
+    margin-bottom: 60px;
+  }
+
+  .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--primary);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    padding: 32px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+  }
+
+  .card-emoji {
+    font-size: 40px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .card-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .card-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .note {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 40px;
+  }
+
+  .note-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .note-text {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 40px 20px; }
+    h1 { font-size: 36px; }
+    .cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>Founder Agent</h1>
+  <p class="subtitle">Hackathon Presentation Materials</p>
+
+  <!-- High-Level Presentations -->
+  <div class="section">
+    <h2 class="section-title">🎯 High-Level Overviews (Start Here)</h2>
+    <div class="cards">
+
+      <a href="overview.html" class="card">
+        <span class="card-emoji">🚀</span>
+        <div class="card-title">The Big Picture</div>
+        <div class="card-desc">
+          What Founder Agent does, the simple 3-step flow, and immediate impact.
+        </div>
+      </a>
+
+      <a href="innovation.html" class="card">
+        <span class="card-emoji">💡</span>
+        <div class="card-title">Innovation</div>
+        <div class="card-desc">
+          What makes this fundamentally different. True autonomy, real-world actions, end-to-end pipeline.
+        </div>
+      </a>
+
+      <a href="impact.html" class="card">
+        <span class="card-emoji">🌍</span>
+        <div class="card-title">Real-World Impact</div>
+        <div class="card-desc">
+          Who this helps, problems solved, and transformation metrics.
+        </div>
+      </a>
+
+      <a href="journey.html" class="card">
+        <span class="card-emoji">🛤️</span>
+        <div class="card-title">The Journey</div>
+        <div class="card-desc">
+          Step-by-step visualization from idea to launched product.
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Technical Deep Dives -->
+  <div class="section">
+    <h2 class="section-title">🔧 Technical Details (For Technical Judges)</h2>
+    <div class="cards">
+
+      <a href="architecture.html" class="card">
+        <span class="card-emoji">🏗️</span>
+        <div class="card-title">System Architecture</div>
+        <div class="card-desc">
+          Complete system breakdown: frontend dashboard, backend agent, browser control, email automation.
+        </div>
+      </a>
+
+      <a href="workflow.html" class="card">
+        <span class="card-emoji">⚙️</span>
+        <div class="card-title">Autonomous Workflow</div>
+        <div class="card-desc">
+          Detailed flowchart of the agent pipeline with all sub-steps and decision points.
+        </div>
+      </a>
+
+      <a href="tech-stack.html" class="card">
+        <span class="card-emoji">🛠️</span>
+        <div class="card-title">Tech Stack</div>
+        <div class="card-desc">
+          Every technology used, why it was chosen, and how it enables autonomy.
+        </div>
+      </a>
+
+      <a href="demo.html" class="card">
+        <span class="card-emoji">📹</span>
+        <div class="card-title">Live Demo Walkthrough</div>
+        <div class="card-desc">
+          Timeline of what happens during a live agent run with real event examples.
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Usage Note -->
+  <div class="note">
+    <div class="note-title">💡 Presentation Tip</div>
+    <div class="note-text">
+      <strong>Start with the high-level overviews</strong> to explain the vision and impact.
+      Use the technical deep dives when judges ask "how does it work?" or want to understand
+      the implementation details. Each page is self-contained and can be viewed independently.
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

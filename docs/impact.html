@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real-World Impact</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712;
+    --surface: #111827;
+    --text: #f9fafb;
+    --text-dim: #9ca3af;
+    --emerald: #10b981;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --orange: #f97316;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 80px 40px;
+    min-height: 100vh;
+  }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes countUp {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .animate { animation: fadeUp 0.6s ease-out both; animation-delay: calc(var(--i, 0) * 0.08s); }
+  .animate-count { animation: countUp 0.5s ease-out both; animation-delay: calc(var(--i, 0) * 0.08s); }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  h1 {
+    font-size: 60px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    font-size: 22px;
+    color: var(--text-dim);
+    margin-bottom: 80px;
+    font-weight: 500;
+  }
+
+  /* Hero Stats */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-bottom: 80px;
+  }
+
+  .hero-stat {
+    background: var(--surface);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+    padding: 48px 40px;
+    text-align: center;
+  }
+
+  .hero-stat-value {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--color) 0%, var(--color-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-stat--time {
+    --color: var(--emerald);
+    --color-light: #34d399;
+  }
+
+  .hero-stat--cost {
+    --color: var(--blue);
+    --color-light: #60a5fa;
+  }
+
+  .hero-stat--barrier {
+    --color: var(--purple);
+    --color-light: #a78bfa;
+  }
+
+  .hero-stat-label {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+  }
+
+  .hero-stat-desc {
+    font-size: 16px;
+    color: var(--text-dim);
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  /* Use Cases */
+  .section-title {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .use-cases {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 80px;
+  }
+
+  .use-case {
+    background: var(--surface);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 16px;
+    padding: 36px;
+  }
+
+  .use-case-emoji {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  .use-case-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .use-case-desc {
+    font-size: 15px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  /* Problem Statement */
+  .problem {
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(17, 24, 39, 0.5) 100%);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    border-radius: 20px;
+    padding: 48px;
+    margin-bottom: 40px;
+  }
+
+  .problem-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #ef4444;
+    margin-bottom: 16px;
+  }
+
+  .problem-text {
+    font-size: 24px;
+    line-height: 1.6;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Solution */
+  .solution {
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(17, 24, 39, 0.5) 100%);
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    border-radius: 20px;
+    padding: 48px;
+    margin-bottom: 80px;
+  }
+
+  .solution-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--emerald);
+    margin-bottom: 16px;
+  }
+
+  .solution-text {
+    font-size: 24px;
+    line-height: 1.6;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Who Benefits */
+  .benefits {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .benefit {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+  }
+
+  .benefit-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+
+  .benefit-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .benefit-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 968px) {
+    body { padding: 40px 20px; }
+    h1 { font-size: 36px; }
+    .hero-stats { grid-template-columns: 1fr; }
+    .use-cases { grid-template-columns: 1fr; }
+    .benefits { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1 class="animate" style="--i:0">Real-World Impact</h1>
+  <p class="subtitle animate" style="--i:1">How Founder Agent changes entrepreneurship</p>
+
+  <!-- Hero Stats -->
+  <div class="hero-stats">
+    <div class="hero-stat hero-stat--time animate-count" style="--i:2">
+      <div class="hero-stat-value">99%</div>
+      <div class="hero-stat-label">Time Saved</div>
+      <div class="hero-stat-desc">
+        From weeks to minutes. Launch products faster than ever.
+      </div>
+    </div>
+
+    <div class="hero-stat hero-stat--cost animate-count" style="--i:3">
+      <div class="hero-stat-value">$0</div>
+      <div class="hero-stat-label">Dev Costs</div>
+      <div class="hero-stat-desc">
+        No developers needed. No infrastructure complexity.
+      </div>
+    </div>
+
+    <div class="hero-stat hero-stat--barrier animate-count" style="--i:4">
+      <div class="hero-stat-value">Zero</div>
+      <div class="hero-stat-label">Code Required</div>
+      <div class="hero-stat-desc">
+        Non-technical founders can launch real products.
+      </div>
+    </div>
+  </div>
+
+  <!-- Problem / Solution -->
+  <div class="problem animate" style="--i:5">
+    <div class="problem-label">The Problem</div>
+    <div class="problem-text">
+      Launching a product takes weeks of setup, requires technical skills, and costs thousands in developer time.
+      Most ideas never get built because the barriers are too high.
+    </div>
+  </div>
+
+  <div class="solution animate" style="--i:6">
+    <div class="solution-label">Our Solution</div>
+    <div class="solution-text">
+      An AI that autonomously handles everything: coding, deployment, marketing, and customer outreach.
+      From idea to launched product in minutes, with zero technical knowledge required.
+    </div>
+  </div>
+
+  <!-- Use Cases -->
+  <h2 class="section-title animate" style="--i:7">Who This Helps</h2>
+
+  <div class="use-cases">
+    <div class="use-case animate" style="--i:8">
+      <div class="use-case-emoji">👤</div>
+      <div class="use-case-title">Solo Founders</div>
+      <div class="use-case-desc">
+        Launch MVPs without hiring a development team. Test ideas quickly before investing heavily.
+      </div>
+    </div>
+
+    <div class="use-case animate" style="--i:9">
+      <div class="use-case-emoji">🏢</div>
+      <div class="use-case-title">Startup Studios</div>
+      <div class="use-case-desc">
+        Spin up multiple business experiments simultaneously. Validate concepts at unprecedented speed.
+      </div>
+    </div>
+
+    <div class="use-case animate" style="--i:10">
+      <div class="use-case-emoji">🎨</div>
+      <div class="use-case-title">Agencies</div>
+      <div class="use-case-desc">
+        Rapidly prototype client ideas. Show working demos instead of static mockups.
+      </div>
+    </div>
+
+    <div class="use-case animate" style="--i:11">
+      <div class="use-case-emoji">🎓</div>
+      <div class="use-case-title">Educators</div>
+      <div class="use-case-desc">
+        Teach entrepreneurship with real launches. Students ship actual products, not just assignments.
+      </div>
+    </div>
+  </div>
+
+  <!-- Benefits -->
+  <h2 class="section-title animate" style="--i:12">The Transformation</h2>
+
+  <div class="benefits">
+    <div class="benefit animate" style="--i:13">
+      <div class="benefit-icon">⚡</div>
+      <div class="benefit-title">Speed</div>
+      <div class="benefit-desc">
+        Launch in minutes instead of weeks. Test 10 ideas in the time it used to take to build one.
+      </div>
+    </div>
+
+    <div class="benefit animate" style="--i:14">
+      <div class="benefit-icon">🎯</div>
+      <div class="benefit-title">Focus</div>
+      <div class="benefit-desc">
+        Spend time on strategy and customers, not infrastructure and boilerplate code.
+      </div>
+    </div>
+
+    <div class="benefit animate" style="--i:15">
+      <div class="benefit-icon">📈</div>
+      <div class="benefit-title">Scale</div>
+      <div class="benefit-desc">
+        Experiment at scale. Rapid validation means more successful products in less time.
+      </div>
+    </div>
+
+    <div class="benefit animate" style="--i:16">
+      <div class="benefit-icon">🚀</div>
+      <div class="benefit-title">Access</div>
+      <div class="benefit-desc">
+        Democratizes entrepreneurship. Anyone with an idea can launch, regardless of technical background.
+      </div>
+    </div>
+
+    <div class="benefit animate" style="--i:17">
+      <div class="benefit-icon">💡</div>
+      <div class="benefit-title">Learning</div>
+      <div class="benefit-desc">
+        Fail fast, learn faster. Get real market feedback instead of guessing what might work.
+      </div>
+    </div>
+
+    <div class="benefit animate" style="--i:18">
+      <div class="benefit-icon">🌍</div>
+      <div class="benefit-title">Real Impact</div>
+      <div class="benefit-desc">
+        More ideas getting built means more innovation, more solutions, more value created.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

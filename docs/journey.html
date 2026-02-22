@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --text: #171717;
+    --text-dim: #737373;
+    --primary: #6366f1;
+    --success: #22c55e;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0a0a;
+      --surface: #171717;
+      --text: #fafafa;
+      --text-dim: #a3a3a3;
+      --primary: #818cf8;
+      --success: #4ade80;
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    padding: 80px 40px;
+    min-height: 100vh;
+  }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .animate { animation: fadeUp 0.6s ease-out both; animation-delay: calc(var(--i, 0) * 0.1s); }
+
+  .container { max-width: 900px; margin: 0 auto; }
+
+  h1 {
+    font-size: 60px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    font-size: 20px;
+    color: var(--text-dim);
+    margin-bottom: 80px;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 48px;
+    top: 60px;
+    bottom: 100px;
+    width: 3px;
+    background: linear-gradient(180deg, var(--primary) 0%, var(--success) 100%);
+  }
+
+  .step {
+    position: relative;
+    padding-left: 120px;
+    margin-bottom: 80px;
+  }
+
+  .step-number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 96px;
+    height: 96px;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 800;
+    color: white;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+  }
+
+  .step:last-child .step-number {
+    background: var(--success);
+  }
+
+  .step-content {
+    background: var(--surface);
+    border: 2px solid rgba(99, 102, 241, 0.2);
+    border-radius: 20px;
+    padding: 40px;
+  }
+
+  .step:last-child .step-content {
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+
+  .step-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .step-desc {
+    font-size: 18px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .step-example {
+    background: rgba(99, 102, 241, 0.08);
+    border-left: 4px solid var(--primary);
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .step:last-child .step-example {
+    background: rgba(34, 197, 94, 0.08);
+    border-left-color: var(--success);
+  }
+
+  .step-outputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .output-item {
+    background: rgba(34, 197, 94, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .output-icon {
+    font-size: 24px;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 40px 20px; }
+    h1 { font-size: 36px; }
+    .timeline::before { left: 32px; }
+    .step { padding-left: 80px; }
+    .step-number {
+      width: 64px;
+      height: 64px;
+      font-size: 28px;
+    }
+    .step-outputs { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1 class="animate" style="--i:0">The Journey</h1>
+  <p class="subtitle animate" style="--i:1">From idea to launched product</p>
+
+  <div class="timeline">
+
+    <!-- Step 1 -->
+    <div class="step animate" style="--i:2">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <div class="step-title">You Have an Idea</div>
+        <div class="step-desc">
+          Just describe what you want to build. No technical specs, no wireframes, no requirements docs.
+        </div>
+        <div class="step-example">
+          "Build a task management app for remote teams with AI-powered priority recommendations"
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step animate" style="--i:3">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <div class="step-title">Agent Thinks & Plans</div>
+        <div class="step-desc">
+          The AI analyzes your vision, chooses the tech stack, plans the architecture, and decides what to build first.
+        </div>
+        <div class="step-example">
+          🤖 "I'll use Next.js with TypeScript for fast iteration..."<br>
+          🤖 "Landing page first, then core task features..."<br>
+          🤖 "Deploying to Vercel for instant production..."
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step animate" style="--i:4">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <div class="step-title">Agent Builds Everything</div>
+        <div class="step-desc">
+          Writes all the code, creates the repository, sets up deployment, generates marketing content.
+          All autonomous, all in minutes.
+        </div>
+        <div class="step-example">
+          ✓ Created 32 files<br>
+          ✓ GitHub repository initialized<br>
+          ✓ Deployed to production<br>
+          ✓ Marketing plans generated
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step animate" style="--i:5">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <div class="step-title">Agent Markets It</div>
+        <div class="step-desc">
+          Posts to social media, sends outreach emails to potential customers. Your product isn't just built—it's announced.
+        </div>
+        <div class="step-example">
+          🐦 Posted launch tweet on X<br>
+          📧 Sent 50 outreach emails<br>
+          📝 Created social media content calendar
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step animate" style="--i:6">
+      <div class="step-number">✓</div>
+      <div class="step-content">
+        <div class="step-title">Your Product is Live</div>
+        <div class="step-desc">
+          Everything is real and functional. Share the URL, track the metrics, collect feedback from real users.
+        </div>
+        <div class="step-outputs">
+          <div class="output-item">
+            <div class="output-icon">🌐</div>
+            <div>Live production URL</div>
+          </div>
+          <div class="output-item">
+            <div class="output-icon">🐙</div>
+            <div>GitHub repository</div>
+          </div>
+          <div class="output-item">
+            <div class="output-icon">🐦</div>
+            <div>Social media posts</div>
+          </div>
+          <div class="output-item">
+            <div class="output-icon">📧</div>
+            <div>Customer emails</div>
+          </div>
+          <div class="output-item">
+            <div class="output-icon">📝</div>
+            <div>Strategic plans</div>
+          </div>
+          <div class="output-item">
+            <div class="output-icon">💳</div>
+            <div>Payment setup</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

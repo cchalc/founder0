@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Founder Agent Workflow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============ THEME: Blueprint Technical ============ */
+  :root {
+    --font-body: 'Inter Tight', system-ui, sans-serif;
+    --font-mono: 'Fira Code', 'SF Mono', Consolas, monospace;
+
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface2: #f1f5f9;
+    --grid: rgba(15, 23, 42, 0.04);
+    --border: rgba(15, 23, 42, 0.1);
+    --border-bright: rgba(15, 23, 42, 0.2);
+    --text: #0f172a;
+    --text-dim: #475569;
+
+    --primary: #0ea5e9;
+    --primary-dim: rgba(14, 165, 233, 0.1);
+    --secondary: #8b5cf6;
+    --secondary-dim: rgba(139, 92, 246, 0.1);
+    --success: #10b981;
+    --success-dim: rgba(16, 185, 129, 0.1);
+    --warning: #f59e0b;
+    --warning-dim: rgba(245, 158, 11, 0.1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #334155;
+      --grid: rgba(148, 163, 184, 0.06);
+      --border: rgba(148, 163, 184, 0.12);
+      --border-bright: rgba(148, 163, 184, 0.24);
+      --text: #f1f5f9;
+      --text-dim: #cbd5e1;
+
+      --primary: #38bdf8;
+      --primary-dim: rgba(56, 189, 248, 0.15);
+      --secondary: #a78bfa;
+      --secondary-dim: rgba(167, 139, 250, 0.15);
+      --success: #34d399;
+      --success-dim: rgba(52, 211, 153, 0.15);
+      --warning: #fbbf24;
+      --warning-dim: rgba(251, 191, 36, 0.15);
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 20px 20px;
+    color: var(--text);
+    font-family: var(--font-body);
+    padding: 60px 40px;
+    min-height: 100vh;
+  }
+
+  /* ============ ANIMATION ============ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate {
+    animation: fadeUp 0.5s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.07s);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-delay: 0ms !important; }
+    .mermaid-wrap .mermaid { transition: none; }
+  }
+
+  /* ============ LAYOUT ============ */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    margin-bottom: 40px;
+    letter-spacing: 0.5px;
+  }
+
+  .description {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 48px;
+    max-width: 750px;
+  }
+
+  /* ============ MERMAID ============ */
+  .mermaid-wrap {
+    position: relative;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 32px;
+    overflow: auto;
+    margin-bottom: 32px;
+  }
+
+  .mermaid-wrap .mermaid {
+    display: flex;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    transform-origin: top center;
+  }
+
+  .zoom-controls {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .zoom-controls button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+
+  .zoom-controls button:hover {
+    background: var(--border);
+    color: var(--text);
+  }
+
+  .mermaid-wrap {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .mermaid-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+  .mermaid-wrap::-webkit-scrollbar-track { background: transparent; }
+  .mermaid-wrap::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+  .mermaid-wrap::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+  .mermaid-wrap.is-zoomed { cursor: grab; }
+  .mermaid-wrap.is-panning { cursor: grabbing; user-select: none; }
+
+  /* ============ MERMAID OVERRIDES ============ */
+  .mermaid .nodeLabel {
+    font-family: var(--font-body) !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+  }
+
+  .mermaid .edgeLabel {
+    font-family: var(--font-mono) !important;
+    font-size: 12px !important;
+  }
+
+  /* ============ CALLOUT ============ */
+  .callout {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 12px;
+    padding: 24px 28px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-top: 32px;
+  }
+
+  .callout strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .callout code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--primary-dim);
+    color: var(--primary);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 768px) {
+    body { padding: 24px 16px; }
+    h1 { font-size: 32px; }
+    .mermaid-wrap { padding: 24px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1 class="animate" style="--i:0">Autonomous Workflow</h1>
+  <p class="subtitle animate" style="--i:1">From Vision to Launched Product</p>
+
+  <p class="description animate" style="--i:2">
+    The agent executes a complete product launch pipeline autonomously. Each step involves multiple
+    tool invocations, file operations, and external API calls—all orchestrated by Claude's reasoning engine.
+    The entire process runs without human intervention from initial prompt to deployed, marketed product.
+  </p>
+
+  <div class="mermaid-wrap animate" style="--i:3">
+    <div class="zoom-controls">
+      <button onclick="zoomDiagram(this, 1.2)" title="Zoom in">+</button>
+      <button onclick="zoomDiagram(this, 0.8)" title="Zoom out">&minus;</button>
+      <button onclick="resetZoom(this)" title="Reset zoom">&#8634;</button>
+    </div>
+    <pre class="mermaid">
+      graph TD
+        A[User Enters Vision] --> B[Agent Analyzes Requirements]
+        B --> C[Scaffold Repository]
+        C --> C1[git init]
+        C --> C2[Create package.json]
+        C --> C3[Build Next.js App]
+        C --> C4[Create README]
+        C1 --> D
+        C2 --> D
+        C3 --> D
+        C4 --> D
+        D[Generate Strategic Plans] --> D1[Marketing Strategy]
+        D --> D2[Monetization Plan]
+        D --> D3[Launch Checklist]
+        D --> D4[Social Media Content]
+        D1 --> E
+        D2 --> E
+        D3 --> E
+        D4 --> E
+        E[Push to GitHub] --> E1[Create Repository]
+        E1 --> E2[Commit All Files]
+        E2 --> E3[Push to Remote]
+        E3 --> F[Post to X/Twitter]
+        F --> F1[Open Browser Session]
+        F1 --> F2[Authenticate]
+        F2 --> F3[Compose Tweet]
+        F3 --> F4[Publish Post]
+        F4 --> G[Send Outreach Emails]
+        G --> G1[Generate Email Content]
+        G1 --> G2[Format HTML + Plain Text]
+        G2 --> G3[Send to Recipients]
+        G3 --> H[Delivered Outputs]
+        H --> H1[Live URL]
+        H --> H2[GitHub Repo]
+        H --> H3[Social Posts]
+        H --> H4[Outreach Emails]
+
+        classDef input fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+        classDef process fill:#fce7f3,stroke:#ec4899,color:#831843
+        classDef output fill:#d1fae5,stroke:#10b981,color:#065f46
+        classDef action fill:#e0e7ff,stroke:#8b5cf6,color:#4c1d95
+
+        class A input
+        class B,C,D,E,F,G process
+        class C1,C2,C3,C4,D1,D2,D3,D4,E1,E2,E3,F1,F2,F3,F4,G1,G2,G3 action
+        class H,H1,H2,H3,H4 output
+    </pre>
+  </div>
+
+  <div class="callout animate" style="--i:4">
+    <strong>Autonomous Execution.</strong> The agent makes all decisions: what tech stack to use,
+    how to structure code, what marketing strategy to employ, and which features to prioritize.
+    Users provide the vision—the agent handles everything from <code>git init</code> to customer emails.
+  </div>
+
+</div>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: isDark ? '#1e293b' : '#e0e7ff',
+      primaryBorderColor: isDark ? '#38bdf8' : '#0ea5e9',
+      primaryTextColor: isDark ? '#f1f5f9' : '#0f172a',
+      secondaryColor: isDark ? '#1e293b' : '#fce7f3',
+      secondaryBorderColor: isDark ? '#a78bfa' : '#8b5cf6',
+      secondaryTextColor: isDark ? '#f1f5f9' : '#0f172a',
+      tertiaryColor: isDark ? '#1e293b' : '#d1fae5',
+      tertiaryBorderColor: isDark ? '#34d399' : '#10b981',
+      tertiaryTextColor: isDark ? '#f1f5f9' : '#0f172a',
+      lineColor: isDark ? '#64748b' : '#94a3b8',
+      fontSize: '15px',
+      fontFamily: "'Inter Tight', system-ui, sans-serif",
+    }
+  });
+</script>
+<script>
+  function updateZoomState(wrap) {
+    var target = wrap.querySelector('.mermaid');
+    var zoom = parseFloat(target.dataset.zoom || '1');
+    wrap.classList.toggle('is-zoomed', zoom > 1);
+  }
+
+  function zoomDiagram(btn, factor) {
+    var wrap = btn.closest('.mermaid-wrap');
+    var target = wrap.querySelector('.mermaid');
+    var current = parseFloat(target.dataset.zoom || '1');
+    var next = Math.min(Math.max(current * factor, 0.3), 5);
+    target.dataset.zoom = next;
+    target.style.transform = 'scale(' + next + ')';
+    updateZoomState(wrap);
+  }
+
+  function resetZoom(btn) {
+    var wrap = btn.closest('.mermaid-wrap');
+    var target = wrap.querySelector('.mermaid');
+    target.dataset.zoom = '1';
+    target.style.transform = 'scale(1)';
+    updateZoomState(wrap);
+  }
+
+  document.querySelectorAll('.mermaid-wrap').forEach(function(wrap) {
+    wrap.addEventListener('wheel', function(e) {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      var target = wrap.querySelector('.mermaid');
+      var current = parseFloat(target.dataset.zoom || '1');
+      var factor = e.deltaY < 0 ? 1.1 : 0.9;
+      var next = Math.min(Math.max(current * factor, 0.3), 5);
+      target.dataset.zoom = next;
+      target.style.transform = 'scale(' + next + ')';
+      updateZoomState(wrap);
+    }, { passive: false });
+
+    var startX, startY, scrollL, scrollT;
+    wrap.addEventListener('mousedown', function(e) {
+      if (e.target.closest('.zoom-controls')) return;
+      var target = wrap.querySelector('.mermaid');
+      if (parseFloat(target.dataset.zoom || '1') <= 1) return;
+      wrap.classList.add('is-panning');
+      startX = e.clientX;
+      startY = e.clientY;
+      scrollL = wrap.scrollLeft;
+      scrollT = wrap.scrollTop;
+    });
+    window.addEventListener('mousemove', function(e) {
+      if (!wrap.classList.contains('is-panning')) return;
+      wrap.scrollLeft = scrollL - (e.clientX - startX);
+      wrap.scrollTop = scrollT - (e.clientY - startY);
+    });
+    window.addEventListener('mouseup', function() {
+      wrap.classList.remove('is-panning');
+    });
+  });
+</script>
+
+</body>
+</html>
